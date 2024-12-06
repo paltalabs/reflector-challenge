@@ -8,18 +8,23 @@ soroban_sdk::contractimport!(
 
 pub type OracleClient<'a> = Client<'a>;
 
-pub fn get_price(e: &Env, asset: &AssetRatio) -> i128 {
+pub fn get_price(e: &Env, asset_ratio: &AssetRatio) -> i128 {
     let config = get_config(e);
-    let oracle = config.oracle;
 
-    let oracleClient = OracleClient::new(&e, &oracle);
-    
-    if asset.symbol == Symbol::new(e, "XRP") {
+    let oracle_client = OracleClient::new(&e, &config.oracle);
 
-        i128::from(2_2_698_160) // Price for XRP
-    } else if asset.symbol == Symbol::new(e, "XLM") {
-        i128::from(4_578_725) // Price for XLM
-    } else {
-        panic!("Unsupported asset symbol")
-    }
+    let asset = Asset::Other(asset_ratio.symbol.clone());
+
+
+    let price = oracle_client.price(&asset, &e.ledger().timestamp());
+
+    match price {
+        None => {
+            panic!("Price not found for asset: {:?}", asset_ratio.symbol);
+        }
+        Some(price) => {
+            price.price
+        }
+        
+    }    
 }

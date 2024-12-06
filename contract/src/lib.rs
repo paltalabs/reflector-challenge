@@ -36,4 +36,11 @@ impl ReflectorChallenge {
         extend_instance_ttl(&e);
         String::from_str(&e, "Rebalance")
     }
+
+
+    // TEMP METHODS FOR TESTING
+    pub fn get_price(e: Env) -> i128 {
+        let asset_ratio = get_config(&e).asset_ratios.get(0).unwrap();
+        oracle::get_price(&e, &asset_ratio)
+    }
 }
