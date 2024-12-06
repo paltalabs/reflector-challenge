@@ -1,6 +1,7 @@
 import {
   Address,
   Asset,
+  nativeToScVal,
   xdr,
 } from "@stellar/stellar-sdk";
 import { toolkitLoader } from "./toolkit";
@@ -13,14 +14,8 @@ import {
 const network = process.argv[2];
 
 const toolkit = toolkitLoader.getNetworkToolkit("testnet");
-const soroban_token = new Address(toolkit.addressBook.getContractId("XRP"));
 
-let xlmContractId: string = Asset.native().contractId(toolkit.passphrase);
-
-export async function deployHodlStrategy(
-  symbol: string = "XLM",
-  contractId: string = ""
-) {
+export async function deployFactory() {
   if (network != "mainnet") await airdropAccount(toolkit, toolkit.admin);
   let account = await toolkit.horizonRpc.loadAccount(toolkit.admin.publicKey());
   console.log("publicKey", toolkit.admin.publicKey());
@@ -28,17 +23,23 @@ export async function deployHodlStrategy(
   console.log("Current Admin account balance:", balance[0].balance);
 
   console.log("-------------------------------------------------------");
-  console.log("Deploying Hodl Strategy");
+  console.log("Deploying defindex factory");
   console.log("-------------------------------------------------------");
 
-  await installContract(toolkit, "hodl_strategy", undefined, toolkit.admin);
+  await installContract(toolkit, "factory", undefined, toolkit.admin);
+  await installContract(toolkit, "vault", undefined, toolkit.admin);
   const emptyVecScVal = xdr.ScVal.scvVec([]);
-  const addressScVal = new Address(contractId).toScVal();
+  const factoryInitParams: xdr.ScVal[] = [
+    new Address(toolkit.admin.publicKey()).toScVal(),
+    new Address(toolkit.admin.publicKey()).toScVal(),
+    nativeToScVal(50, {type: "u32"}),
+    nativeToScVal(Buffer.from(toolkit.addressBook.getWasmHash("vault"), "hex")),
+  ];
   await deployContract(
     toolkit,
-    "hodl_strategy",
-    `hodl_${symbol.toLowerCase()}`,
-    [addressScVal, emptyVecScVal],
+    "factory",
+    `defindex_factory`,
+    factoryInitParams,
     toolkit.admin
   );
 }
@@ -46,8 +47,7 @@ export async function deployHodlStrategy(
 
 async function main() {
   try {
-    await deployHodlStrategy("XLM", xlmContractId);
-    await deployHodlStrategy("XRP", soroban_token.toString());
+    await deployFactory();
     toolkit.addressBook.writeToFile();
   } catch (e) {
     console.error(e);
