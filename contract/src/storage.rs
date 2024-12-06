@@ -1,4 +1,4 @@
-use soroban_sdk::{contracttype, Env, Vec};
+use soroban_sdk::{contracttype, Address, Env, Vec};
 
 use crate::model::AssetRatio;
 
@@ -6,7 +6,8 @@ use crate::model::AssetRatio;
 #[contracttype]
 
 pub enum DataKey {
-    AssetRatios
+    AssetRatios,
+    Vault
 }
 
 const DAY_IN_LEDGERS: u32 = 17280;
@@ -28,3 +29,10 @@ pub fn get_asset_ratios(e: &Env) -> Vec<AssetRatio> {
     e.storage().instance().get(&DataKey::AssetRatios).unwrap()
 }
 
+pub fn set_vault(e: &Env, vault: Address) {
+    e.storage().instance().set(&DataKey::Vault, &vault);
+}
+
+pub fn get_vault(e: &Env) -> Address {
+    e.storage().instance().get(&DataKey::Vault).unwrap()
+}
