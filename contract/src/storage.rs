@@ -1,10 +1,12 @@
-use soroban_sdk::{contracttype, Env};
+use soroban_sdk::{contracttype, Env, Vec};
+
+use crate::model::AssetRatio;
 
 #[derive(Clone)]
 #[contracttype]
 
 pub enum DataKey {
-    Initialized,
+    AssetRatios
 }
 
 const DAY_IN_LEDGERS: u32 = 17280;
@@ -17,8 +19,12 @@ pub fn extend_instance_ttl(e: &Env) {
         .extend_ttl(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
 }
 
-pub fn set_initialized(e: &Env) {
-    e.storage().instance().set(&DataKey::Initialized, &true);
+// AssetRatio
+pub fn set_asset_ratios(e: &Env, asset_ratios: Vec<AssetRatio>) {
+    e.storage().instance().set(&DataKey::AssetRatios, &asset_ratios);
 }
 
-// AssetRatio
+pub fn get_asset_ratios(e: &Env) -> Vec<AssetRatio> {
+    e.storage().instance().get(&DataKey::AssetRatios).unwrap()
+}
+
