@@ -1,10 +1,12 @@
 use soroban_sdk::{contracttype, Env};
 
+use crate::model::Config;
+
 #[derive(Clone)]
 #[contracttype]
 
 pub enum DataKey {
-    Initialized,
+    Config
 }
 
 const DAY_IN_LEDGERS: u32 = 17280;
@@ -17,6 +19,11 @@ pub fn extend_instance_ttl(e: &Env) {
         .extend_ttl(INSTANCE_LIFETIME_THRESHOLD, INSTANCE_BUMP_AMOUNT);
 }
 
-pub fn set_initialized(e: &Env) {
-    e.storage().instance().set(&DataKey::Initialized, &true);
+// AssetRatio
+pub fn set_config(e: &Env, config: Config) {
+    e.storage().instance().set(&DataKey::Config, &config);
+}
+
+pub fn get_config(e: &Env) -> Config {
+    e.storage().instance().get(&DataKey::Config).unwrap()
 }

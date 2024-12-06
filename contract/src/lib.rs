@@ -1,28 +1,38 @@
 #![no_std]
 use crate::model::AssetRatio;
-use soroban_sdk::{contract, contractimpl, Env, String, Vec};
+use model::Config;
+use soroban_sdk::{contract, contractimpl, Address, Env, String, Vec};
 
 mod model;
 mod storage;
+mod oracle;
 
-use storage::{extend_instance_ttl, set_initialized};
+use storage::{extend_instance_ttl, get_config, set_config};
 
 #[contract]
-struct ReflectorChallenge;
+pub struct ReflectorChallenge;
 
 #[contractimpl]
 impl ReflectorChallenge {
-    fn __constructor(e: Env, asset_ratios: Vec<AssetRatio>) {
-        set_initialized(&e);
+    pub fn __constructor(e: Env, vault: Address, oracle: Address, asset_ratios: Vec<AssetRatio>) {
+        if asset_ratios.len() == 0 {
+            panic!("Asset ratios must not be empty");
+        }
+
+        let config = Config {
+            vault,
+            oracle,
+            asset_ratios,
+        };
+
+        set_config(&e, config);
     }
 
-    fn hello_world(e: Env) -> String {
-        extend_instance_ttl(&e);
-
-        String::from_str(&e, "Hello world")
+    pub fn config(e: Env) -> Config {
+        get_config(&e)
     }
 
-    fn rebalance(e: Env) {
+    pub fn rebalance(e: Env) -> String {
         extend_instance_ttl(&e);
         String::from_str(&e, "Rebalance")
     }

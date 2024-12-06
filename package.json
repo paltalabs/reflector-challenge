@@ -11,9 +11,9 @@
     "deployHodl": "ts-node src/deploy_hodl.ts"
   },
   "dependencies": {
+    "@stellar/stellar-sdk": "^13.0.0",
     "dotenv": "^16.4.7",
-    "soroban-toolkit": "^0.1.0",
-    "@stellar/stellar-sdk": "^13.0.0"
+    "soroban-toolkit": "^0.1.2"
   },
   "devDependencies": {
     "@types/node": "^20.6.1",
