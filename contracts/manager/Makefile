@@ -7,7 +7,7 @@ test: build
 
 build:
 	cargo build --target wasm32-unknown-unknown --release
-	soroban contract optimize --wasm ./target/wasm32-unknown-unknown/release/challenge.wasm
+	soroban contract optimize --wasm ./target/wasm32-unknown-unknown/release/trusless_manager.wasm
 	@rm ./target/wasm32-unknown-unknown/release/challenge.wasm
 
 fmt:
