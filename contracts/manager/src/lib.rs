@@ -3,11 +3,12 @@ use crate::model::AssetRatio;
 use model::Config;
 use soroban_sdk::{contract, contractimpl, Address, Env, String, Vec};
 
-pub mod model;
-pub mod oracle;
-pub mod storage;
-pub mod utils;
-pub mod vault;
+mod model;
+mod oracle;
+mod storage;
+mod test;
+mod utils;
+mod vault;
 
 use storage::{extend_instance_ttl, get_config, set_config};
 
@@ -45,6 +46,3 @@ impl ReflectorChallenge {
         oracle::get_price(&e, &asset_ratio)
     }
 }
-
-#[cfg(test)]
-mod test;
