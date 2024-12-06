@@ -24,6 +24,6 @@ impl ReflectorChallenge {
 
     fn rebalance(e: Env) {
         extend_instance_ttl(&e);
-        String::from_str(&e, "Rebalance")
+        String::from_str(&e, "Rebalance");
     }
 }
