@@ -1,3 +1,9 @@
+Set up the environment variables
+
+```
+cp .env.example .env
+```
+
 ```
 docker compose up -d
 bash run.sh
