@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { deploySorobanToken } from "soroban-toolkit";
-import { toolkitLoader,  } from "./toolkit";
-
+import { toolkitLoader } from "./toolkit";
 
 async function main() {
   const toolkit = toolkitLoader.getNetworkToolkit("testnet");

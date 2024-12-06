@@ -20,3 +20,5 @@ pub fn extend_instance_ttl(e: &Env) {
 pub fn set_initialized(e: &Env) {
     e.storage().instance().set(&DataKey::Initialized, &true);
 }
+
+// AssetRatio

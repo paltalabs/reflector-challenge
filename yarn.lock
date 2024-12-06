@@ -263,10 +263,10 @@ sodium-native@^4.3.0:
   dependencies:
     node-gyp-build "^4.8.0"
 
-soroban-toolkit@^0.1.0:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/soroban-toolkit/-/soroban-toolkit-0.1.1.tgz#aff1ebd2fceca41efe7fe4c8e587bd02bc2eae14"
-  integrity sha512-6W5V0ao27v8jKTCsCTDz2t+oncBe32DbqF1yCXmSSZwXPjRYpNaf96p8UEJrGD+yiNOtO1TSkG/s8JayZY36EA==
+soroban-toolkit@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/soroban-toolkit/-/soroban-toolkit-0.1.2.tgz#45d4d0221f73958dc7866203fd14103864c08a87"
+  integrity sha512-AxM/DnWJAZpzPYCFQcgDsWAJ8si/vJ7Z6U79i+qGH8whlKRuAkGv2EL/gf5e8VqJEr2HeSmtwCXl50xsJgpEKQ==
   dependencies:
     "@stellar/stellar-sdk" "^13.0.0"
 
