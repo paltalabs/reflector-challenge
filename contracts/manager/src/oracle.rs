@@ -1,4 +1,4 @@
-use soroban_sdk::{Env, Symbol};
+use soroban_sdk::{Env};
 
 use crate::{model::AssetRatio, storage::get_config};
 
