@@ -17,7 +17,7 @@ const soroban_token = new Address(toolkit.addressBook.getContractId("XRP"));
 
 let xlmContractId: string = Asset.native().contractId(toolkit.passphrase);
 
-export async function deployHdolStrategy(
+export async function deployHodlStrategy(
   symbol: string = "XLM",
   contractId: string = ""
 ) {
@@ -46,8 +46,8 @@ export async function deployHdolStrategy(
 
 async function main() {
   try {
-    await deployHdolStrategy("XLM", xlmContractId);
-    await deployHdolStrategy("XRP", soroban_token.toString());
+    await deployHodlStrategy("XLM", xlmContractId);
+    await deployHodlStrategy("XRP", soroban_token.toString());
     toolkit.addressBook.writeToFile();
   } catch (e) {
     console.error(e);
