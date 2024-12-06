@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.7",
-    "soroban-toolkit": "^0.1.0"
+    "soroban-toolkit": "^0.1.1"
   },
   "devDependencies": {
     "@types/node": "^20.6.1",
