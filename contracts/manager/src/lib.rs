@@ -4,8 +4,11 @@ use model::Config;
 use soroban_sdk::{contract, contractimpl, Address, Env, String, Vec};
 
 mod model;
-mod storage;
 mod oracle;
+mod storage;
+mod test;
+mod utils;
+mod vault;
 
 use storage::{extend_instance_ttl, get_config, set_config};
 
@@ -36,7 +39,6 @@ impl ReflectorChallenge {
         extend_instance_ttl(&e);
         String::from_str(&e, "Rebalance")
     }
-
 
     // TEMP METHODS FOR TESTING
     pub fn get_price(e: Env) -> i128 {
