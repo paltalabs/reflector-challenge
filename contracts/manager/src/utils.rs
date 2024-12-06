@@ -1,5 +1,6 @@
 use crate::model::Config;
-use crate::model::{CurrentAssetInvestmentAllocation, StrategyAllocation};
+use crate::vault::CurrentAssetInvestmentAllocation;
+use crate::vault::Instruction;
 use soroban_sdk::{Address, Env, Map, Vec};
 
 pub fn calculate_rebalance(

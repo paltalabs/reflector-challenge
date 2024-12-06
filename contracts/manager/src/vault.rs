@@ -1,5 +1,6 @@
-use crate::model::{CurrentAssetInvestmentAllocation, StrategyAllocation};
 use soroban_sdk::{contract, contractimpl, Address, Env, Map};
+
+soroban_sdk::contractimport!(file = "src/defindex_vault.wasm");
 
 pub trait VaultTrait {
     fn fetch_total_managed_funds(e: Env) -> Map<Address, CurrentAssetInvestmentAllocation>;

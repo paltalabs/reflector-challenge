@@ -9,7 +9,8 @@
     "deployXRPToken": "ts-node src/deployXRPToken.ts",
     "mintAndCreateLP": "ts-node src/mintAndCreateLP.ts",
     "deployHodl": "ts-node src/deploy_hodl.ts",
-    "deployFactory": "ts-node src/deploy_factory.ts"
+    "deployFactory": "ts-node src/deploy_factory.ts",
+    "deployVaults": "ts-node src/deploy_vaults.ts"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "^13.0.0",
