@@ -2,7 +2,7 @@ use crate::model::{CurrentAssetInvestmentAllocation, StrategyAllocation};
 use soroban_sdk::{contract, contractimpl, Address, Env, Map};
 
 pub trait VaultTrait {
-    fn fetch_current_idle_funds(e: Env) -> Map<Address, CurrentAssetInvestmentAllocation>;
+    fn fetch_total_managed_funds(e: Env) -> Map<Address, CurrentAssetInvestmentAllocation>;
 }
 
 #[contract]
@@ -10,7 +10,7 @@ pub struct Vault;
 
 #[contractimpl]
 impl VaultTrait for Vault {
-    fn fetch_current_idle_funds(e: Env) -> Map<Address, CurrentAssetInvestmentAllocation> {
+    fn fetch_total_managed_funds(e: Env) -> Map<Address, CurrentAssetInvestmentAllocation> {
         // Create a new map to store the results
         let mut funds_map: Map<Address, CurrentAssetInvestmentAllocation> = Map::new(&e);
 
