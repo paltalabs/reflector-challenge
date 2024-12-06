@@ -1,0 +1,16 @@
+services:
+  paltalabs-reflector-challenge:
+    image: esteblock/soroban-preview:22.0.1@sha256:9abf8af74a019150b99638beba38059bc1488e47d4869f746b59aee711f0c1b7
+    container_name: paltalabs-reflector-challenge
+    volumes:
+      - .:/workspace
+    ipc: host
+    command: tail -f /dev/null
+    ports:
+      - "3000:3000"
+      - "3010:3010"
+      - "3050:3050"
+
+networks:
+  reflector-challenge-network:
+    driver: bridge
