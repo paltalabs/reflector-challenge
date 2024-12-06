@@ -1,5 +1,5 @@
 [package]
-name = "challenge"
+name = "trusless-manager"
 version = "0.1.0"
 authors = ["paltalabs <paltalabs.io>"]
 license = "GPL-3.0"
