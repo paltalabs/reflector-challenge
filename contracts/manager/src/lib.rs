@@ -6,6 +6,7 @@ use soroban_sdk::{contract, contractimpl, Address, Env, String, Vec};
 mod model;
 mod storage;
 mod oracle;
+mod test;
 
 use storage::{extend_instance_ttl, get_config, set_config};
 
