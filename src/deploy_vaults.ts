@@ -31,27 +31,27 @@ export async function deployVaults() {
   console.log("-------------------------------------------------------");
   console.log("Deploying vault");
   console.log("-------------------------------------------------------");
-  await installContract(toolkit, "vault", undefined, toolkit.admin);
+  await installContract(toolkit, "vault");
   const assets = [
     {
       address: toolkit.addressBook.getContractId("XRP"),
       strategies: [
         {
-          name: "Fixed Strategy",
+          name: "Hodl XRP",
           address: toolkit.addressBook.getContractId("hodl_xrp"),
-          paused: false
-        }
-      ]
+          paused: false,
+        },
+      ],
     },
     {
       address: Asset.native().contractId(toolkit.passphrase),
       strategies: [
         {
-          name: "Hodl Strategy",
+          name: "Hodl XLM",
           address: toolkit.addressBook.getContractId("hodl_xlm"),
-          paused: false
+          paused: false,
         },
-      ]
+      ],
     },
   ];
 
@@ -99,31 +99,29 @@ export async function deployVaults() {
   */
 
   const createDeFindexParams: xdr.ScVal[] = [
-    new Address(toolkit.admin.publicKey()).toScVal(),   // emergency_manager
-    new Address(toolkit.admin.publicKey()).toScVal(),   // fee_receiver
-    nativeToScVal(100, { type: "u32" }),                // vault_fee
-    nativeToScVal("AAA/XRP", { type: "string" }),       // vault_name
-    nativeToScVal("HXRM", { type: "string" }),          // vault_symbol
-    new Address(toolkit.admin.publicKey()).toScVal(),   // manager
-    xdr.ScVal.scvVec(assetAllocations),                 // assets
-    nativeToScVal(randomBytes(32)),                     // salt
+    new Address(toolkit.admin.publicKey()).toScVal(), // emergency_manager
+    new Address(toolkit.admin.publicKey()).toScVal(), // fee_receiver
+    nativeToScVal(100, { type: "u32" }), // vault_fee
+    nativeToScVal("AAA/XRP", { type: "string" }), // vault_name
+    nativeToScVal("HXRM", { type: "string" }), // vault_symbol
+    new Address(toolkit.admin.publicKey()).toScVal(), // manager
+    xdr.ScVal.scvVec(assetAllocations), // assets
+    nativeToScVal(randomBytes(32)), // salt
   ];
 
   const result = await invokeContract(
     toolkit,
     "defindex_factory",
     "create_defindex_vault",
-    createDeFindexParams,
-    false,
-    toolkit.admin
+    createDeFindexParams
   );
 
-
-  console.log('🚀 « DeFindex Vault created with address:', scValToNative(result.returnValue));
+  console.log(
+    "🚀 « DeFindex Vault created with address:",
+    scValToNative(result.returnValue)
+  );
   return scValToNative(result.returnValue);
- 
 }
-
 
 async function main() {
   try {
