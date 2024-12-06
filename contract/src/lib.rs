@@ -5,24 +5,26 @@ use soroban_sdk::{contract, contractimpl, Env, String, Vec};
 mod model;
 mod storage;
 
-use storage::{extend_instance_ttl, set_initialized};
+use storage::{extend_instance_ttl, get_asset_ratios, set_asset_ratios};
 
 #[contract]
-struct ReflectorChallenge;
+pub struct ReflectorChallenge;
 
 #[contractimpl]
 impl ReflectorChallenge {
-    fn __constructor(e: Env, asset_ratios: Vec<AssetRatio>) {
-        set_initialized(&e);
+    pub fn __constructor(e: Env, asset_ratios: Vec<AssetRatio>) {
+        if asset_ratios.len() == 0 {
+            panic!("Asset ratios must not be empty");
+        }
+
+        set_asset_ratios(&e, asset_ratios);
     }
 
-    fn hello_world(e: Env) -> String {
-        extend_instance_ttl(&e);
-
-        String::from_str(&e, "Hello world")
+    pub fn assets(e: Env) -> Vec<AssetRatio> {
+        get_asset_ratios(&e)
     }
 
-    fn rebalance(e: Env) {
+    pub fn rebalance(e: Env) -> String {
         extend_instance_ttl(&e);
         String::from_str(&e, "Rebalance");
     }
