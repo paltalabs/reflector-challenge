@@ -6,10 +6,12 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node src/main.ts",
-    "deployXRPToken": "ts-node src/deployXRPToken.ts"
+    "deployXRPToken": "ts-node src/deployXRPToken.ts",
+    "mintAndCreateLP": "ts-node src/mintAndCreateLP.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
+    "@stellar/stellar-sdk": "^13.0.0",
     "soroban-toolkit": "^0.1.0"
   },
   "devDependencies": {
