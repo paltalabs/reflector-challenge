@@ -3,7 +3,7 @@ use soroban_sdk::{Env, Symbol};
 use crate::{model::AssetRatio, storage::get_config};
 
 soroban_sdk::contractimport!(
-    file = "src/reflector.wasm"
+    file = "../reflector.wasm"
 );
 
 pub type OracleClient<'a> = Client<'a>;
