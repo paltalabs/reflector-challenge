@@ -8,6 +8,7 @@
     "start": "ts-node src/main.ts"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "soroban-toolkit": "^0.1.0"
   },
   "devDependencies": {
