@@ -24,3 +24,11 @@ pub struct CurrentAssetInvestmentAllocation {
     pub invested_amount: i128,
     pub strategy_allocations: Vec<StrategyAllocation>,
 }
+
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Config {
+    pub vault: Address,
+    pub oracle: Address,
+    pub asset_ratios: Vec<AssetRatio>,
+}

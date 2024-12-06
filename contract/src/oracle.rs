@@ -1,5 +1,5 @@
 use crate::model::AssetRatio;
-use soroban_sdk::{contractimport, Address, Env};
+use soroban_sdk::{contractimport, Address, Env, Symbol};
 
 pub fn get_price(e: &Env, asset: &AssetRatio) -> i128 {
     if asset.symbol == Symbol::new(e, "XRP") {
