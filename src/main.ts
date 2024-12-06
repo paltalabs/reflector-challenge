@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { toolkitLoader } from "./toolkit";
 
 async function main() {

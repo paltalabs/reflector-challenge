@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "start": "ts-node src/main.ts",
-    "deployXRPToken": "ts-node src/deployXRPToken.ts"
+    "deployXRPToken": "ts-node src/deployXRPToken.ts",
+    "deployHodl": "ts-node src/deploy_hodl.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
