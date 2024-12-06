@@ -30,15 +30,17 @@ use defindex_vault::{DeFindexVaultClient, Strategy};
 use hodl_strategy::HodlStrategyClient;
 use reflector::ReflectorClient;
 
-// // Deploy Contracts
-// fn create_defindex_vault<'a>(e: &Env) -> DeFindexVaultClient<'a> {
-//     let address = &e.register_contract_wasm(None, defindex_vault::WASM);
-//     DeFindexVaultClient::new(e, address)
-// }
-// fn create_defindex_factory<'a>(e: & Env) -> DeFindexFactoryClient<'a> {
-//     let address = &e.register_contract_wasm(None, defindex_factory::WASM);
-//     DeFindexFactoryClient::new(e, address)
-// }
+// Deploy Contracts
+fn create_defindex_vault<'a>(e: &Env) -> DeFindexVaultClient<'a> {
+    // let address = &e.register_contract_wasm(None, defindex_vault::WASM);
+    let address = &e.register(defindex_vault::WASM, ());
+    DeFindexVaultClient::new(e, address)
+}
+fn create_defindex_factory<'a>(e: & Env) -> DeFindexFactoryClient<'a> {
+    // let address = &e.register_contract_wasm(None, defindex_factory::WASM);
+    let address = &e.register(defindex_factory::WASM, ());
+    DeFindexFactoryClient::new(e, address)
+}
 fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> {
     let init_args: Vec<Val> = sorobanvec![&e];
     let args = (asset, init_args);
@@ -47,92 +49,87 @@ fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> 
     let hodl_strategy = HodlStrategyClient::new(e, address);
     hodl_strategy
 }
-// pub fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> {
-//     let init_args: Vec<Val>= vec![e];
 
-//     let args = (asset, init_args);
-//     HodlStrategyClient::new(e, &e.register(HodlStrategy, args))
-// }
-// pub(crate) fn create_token_contract<'a>(e: &Env, admin: &Address) -> SorobanTokenClient<'a> {
-//     SorobanTokenClient::new(e,&e.register_stellar_asset_contract_v2(admin.clone()).address())
-// }
+// TOKEN RELATED FUNCTIONS
+pub(crate) fn create_token_contract<'a>(e: &Env, admin: &Address) -> SorobanTokenClient<'a> {
+    SorobanTokenClient::new(e,&e.register_stellar_asset_contract_v2(admin.clone()).address())
+}
+pub(crate) fn get_token_admin_client<'a>(e: &Env,address: &Address) -> SorobanTokenAdminClient<'a> {
+    SorobanTokenAdminClient::new(e, address)
+}
 
-// pub(crate) fn get_token_admin_client<'a>(
-//     e: &Env,
-//     address: &Address,
-// ) -> SorobanTokenAdminClient<'a> {
-//     SorobanTokenAdminClient::new(e, address)
-// }
-
-// pub(crate) fn create_strategy_params_token0(test: &DeFindexVaultTest) -> Vec<Strategy> {
+// pub(crate) fn create_strategy_params_token_0(test: &TrustlessManagerTest) -> Vec<Strategy> {
 //     sorobanvec![
 //         &test.env,
 //         Strategy {
 //             name: String::from_str(&test.env, "Strategy 1"),
-//             address: test.strategy_client_token0.address.clone(),
+//             address: test.strategy_client_token_0.address.clone(),
 //             paused: false,
 //         }
 //     ]
 // }
 
-// pub(crate) fn create_strategy_params_token1(test: &DeFindexVaultTest) -> Vec<Strategy> {
+// pub(crate) fn create_strategy_params_token_1(test: &TrustlessManagerTest) -> Vec<Strategy> {
 //     sorobanvec![
 //         &test.env,
 //         Strategy {
 //             name: String::from_str(&test.env, "Strategy 1"),
-//             address: test.strategy_client_token1.address.clone(),
+//             address: test.strategy_client_token_1.address.clone(),
 //             paused: false,
 //         }
 //     ]
 // }
 
-// pub struct DeFindexVaultTest<'a> {
-//     env: Env,
-//     defindex_factory: Address,
-//     defindex_contract: DeFindexVaultClient<'a>,
-//     token0_admin_client: SorobanTokenAdminClient<'a>,
-//     token0: SorobanTokenClient<'a>,
-//     token0_admin: Address,
-//     token1_admin_client: SorobanTokenAdminClient<'a>,
-//     token1: SorobanTokenClient<'a>,
-//     token1_admin: Address,
+pub struct TrustlessManagerTest<'a> {
+// pub struct TrustlessManagerTest {
+
+    env: Env,
+    defindex_factory: Address,
+    defindex_vault: DeFindexVaultClient<'a>,
+    token_0_admin_client: SorobanTokenAdminClient<'a>,
+    token_0: SorobanTokenClient<'a>,
+    token_0_admin: Address,
+    token_1_admin_client: SorobanTokenAdminClient<'a>,
+    token_1: SorobanTokenClient<'a>,
+    token_1_admin: Address,
 //     emergency_manager: Address,
 //     vault_fee_receiver: Address,
 //     defindex_protocol_receiver: Address,
 //     manager: Address,
-//     strategy_client_token0: HodlStrategyClient<'a>,
-//     strategy_client_token1: HodlStrategyClient<'a>,
-// }
+//     strategy_client_token_0: HodlStrategyClient<'a>,
+//     strategy_client_token_1: HodlStrategyClient<'a>,
+}
 
-// impl<'a> DeFindexVaultTest<'a> {
-//     fn setup() -> Self {
-//         let env = Env::default();
-//         // env.mock_all_auths();
+impl<'a> TrustlessManagerTest<'a> {
+// impl TrustlessManagerTest {
+    fn setup() -> Self {
+        let env = Env::default();
+        // env.mock_all_auths();
 
-//         // Mockup, should be the factory contract
-//         let defindex_factory = Address::generate(&env);
-
-//         let defindex_contract = create_defindex_vault(&env);
+        // Mockup, should be the factory contract
+        let defindex_factory = Address::generate(&env);
+        let defindex_vault = create_defindex_vault(&env);
 
 //         let emergency_manager = Address::generate(&env);
 //         let vault_fee_receiver = Address::generate(&env);
 //         let defindex_protocol_receiver = Address::generate(&env);
 //         let manager = Address::generate(&env);
 
-//         let token0_admin = Address::generate(&env);
-//         let token0 = create_token_contract(&env, &token0_admin);
+        let token_0_admin = Address::generate(&env);
+        let token_0 = create_token_contract(&env, &token_0_admin);
 
-//         let token1_admin = Address::generate(&env);
-//         let token1 = create_token_contract(&env, &token1_admin);
+        let token_1_admin = Address::generate(&env);
+        let token_1 = create_token_contract(&env, &token_1_admin);
 
-//         let token0_admin_client = get_token_admin_client(&env, &token0.address.clone());
-//         let token1_admin_client = get_token_admin_client(&env, &token1.address.clone());
+        let token_0_admin_client = get_token_admin_client(&env, &token_0.address.clone());
+        let token_1_admin_client = get_token_admin_client(&env, &token_1.address.clone());
 
-//         // token1_admin_client.mint(to, amount);
+//         // token_1_admin_client.mint(to, amount);
 
-//         let strategy_client_token0 = create_hodl_strategy(&env, &token0.address);
-//         let strategy_client_token1 = create_hodl_strategy(&env, &token1.address);
+//         let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
+//         let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
 
+<<<<<<< HEAD
 //         env.budget().reset_unlimited();
 
 //         DeFindexVaultTest {
@@ -145,14 +142,28 @@ fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> 
 //             token1_admin_client,
 //             token1,
 //             token1_admin,
+=======
+        env.budget().reset_unlimited();
+        
+        TrustlessManagerTest {
+            env,
+            defindex_factory,
+            defindex_vault,
+            token_0_admin_client,
+            token_0,
+            token_0_admin,
+            token_1_admin_client,
+            token_1,
+            token_1_admin,
+>>>>>>> 4a0331b6b89974e1c6eb5b89b3d9a6717650bb89
 //             emergency_manager,
 //             vault_fee_receiver,
 //             defindex_protocol_receiver,
 //             manager,
-//             strategy_client_token0,
-//             strategy_client_token1,
-//         }
-//     }
+//             strategy_client_token_0,
+//             strategy_client_token_1,
+        }
+    }
 
 //     pub(crate) fn generate_random_users(e: &Env, users_count: u32) -> vec::Vec<Address> {
 //         let mut users = vec![];
@@ -161,7 +172,7 @@ fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> 
 //         }
 //         users
 //     }
-// }
+}
 
 // mod vault;
 mod utils;
