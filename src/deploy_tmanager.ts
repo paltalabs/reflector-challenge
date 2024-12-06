@@ -20,8 +20,50 @@ async function deployTManager() {
   console.log("Deploying Trustless Manager");
   console.log("-------------------------------------------------------");
 
-  await installContract(toolkit, "tmanager");
+  const assetRatios = [
+    {
+      asset: toolkit.addressBook.getContractId("XRP"),
+      symbol: "XRP",
+      ratio: 1,
+    },
+    {
+      asset: toolkit.addressBook.getContractId("XLM"),
+      symbol: "XLM",
+      ratio: 1,
+    },
+  ];
 
+  // const assetAllocations = assets.map((asset) => {
+  //   return xdr.ScVal.scvMap([
+  //     new xdr.ScMapEntry({
+  //       key: xdr.ScVal.scvSymbol("address"),
+  //       val: asset.address.toScVal(),
+  //     }),
+  //     new xdr.ScMapEntry({
+  //       key: xdr.ScVal.scvSymbol("strategies"),
+  //       val: xdr.ScVal.scvVec(
+  //         asset.strategies.map((strategy) =>
+  //           xdr.ScVal.scvMap([
+  //             new xdr.ScMapEntry({
+  //               key: xdr.ScVal.scvSymbol("address"),
+  //               val: new Address(strategy.address).toScVal(),
+  //             }),
+  //             new xdr.ScMapEntry({
+  //               key: xdr.ScVal.scvSymbol("name"),
+  //               val: nativeToScVal(strategy.name, { type: "string" }),
+  //             }),
+  //             new xdr.ScMapEntry({
+  //               key: xdr.ScVal.scvSymbol("paused"),
+  //               val: nativeToScVal(false, { type: "bool" }),
+  //             }),
+  //           ])
+  //         )
+  //       ),
+  //     }),
+  //   ]);
+  // });
+
+  await installContract(toolkit, "tmanager");
   await deployContract(
     toolkit,
     "tmanager",
