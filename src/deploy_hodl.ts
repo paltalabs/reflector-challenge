@@ -2,9 +2,12 @@ import { Address, Asset, nativeToScVal, Networks, xdr } from "@stellar/stellar-s
 import { toolkitLoader } from "./toolkit";
 import { airdropAccount, deployContract, installContract, invokeContract,  } from "soroban-toolkit";
 
-
 const toolkit = toolkitLoader.getNetworkToolkit("testnet");
-export async function deployContracts() {
+
+
+let xlmContractId: string = Asset.native().contractId(toolkit.passphrase);
+
+export async function deployHdolStrategy(symbol: string = "XLM", contractId: string = "") {
   if (network != "mainnet") await airdropAccount(toolkit, toolkit.admin);
   let account = await toolkit.horizonRpc.loadAccount(
     toolkit.admin.publicKey()
@@ -16,52 +19,26 @@ export async function deployContracts() {
   console.log("-------------------------------------------------------");
   console.log("Deploying Hodl Strategy");
   console.log("-------------------------------------------------------");
+
   await installContract(toolkit, "hodl_strategy", undefined, toolkit.admin);
+  const emptyVecScVal = xdr.ScVal.scvVec([]);
+  const addressScVal = new Address(contractId).toScVal();
   await deployContract(
     toolkit,
     "hodl_strategy",
-    [nativeToScVal("hodl_strategy")],
+    `hodl_${symbol.toLowerCase()}`,
+    [addressScVal, emptyVecScVal],
     toolkit.admin,
-  );
-
-  const xlm = Asset.native();
-  let xlmContractId: string;
-  switch (network) {
-    case "testnet":
-      xlmContractId = xlm.contractId(Networks.TESTNET);
-      break;
-    case "mainnet":
-      xlmContractId = xlm.contractId(Networks.PUBLIC);
-      break;
-    default:
-      console.log("Invalid network:", network, "It should be either testnet or mainnet");
-      return;
-      break;
-  }
-  const xlmAddress = new Address(xlmContractId);
-  const xlmScVal = xlmAddress.toScVal();
-
-  const soroswapUSDC = new Address("CAAFIHB4I7WQMJMKC22CZVQNNX7EONWSOMT6SUXK6I3G3F6J4XFRWNDI");
-  const usdcScVal = soroswapUSDC.toScVal();
-
-  const emptyVecScVal = xdr.ScVal.scvVec([]);
-
-  console.log("Initializing DeFindex HODL Strategy");
-  await invokeContract(
-    toolkit,
-    "hodl_strategy",
-    "initialize",
-    [usdcScVal],
-    false,
-    toolkit.admin
   );
 }
 
 const network = process.argv[2];
 
+const soroban_token = new Address(toolkit.addressBook.getContractId("soroban_token"))
 async function main(){
   try {
-    await deployContracts();
+    await deployHdolStrategy("XLM", xlmContractId);
+    await deployHdolStrategy("XRP", soroban_token.toString());
     toolkit.addressBook.writeToFile();
   } catch (e) {
     console.error(e);
