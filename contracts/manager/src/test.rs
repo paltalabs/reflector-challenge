@@ -36,7 +36,7 @@ fn create_defindex_vault<'a>(e: &Env) -> DeFindexVaultClient<'a> {
     let address = &e.register(defindex_vault::WASM, ());
     DeFindexVaultClient::new(e, address)
 }
-fn create_defindex_factory<'a>(e: & Env) -> DeFindexFactoryClient<'a> {
+fn create_defindex_factory<'a>(e: &Env) -> DeFindexFactoryClient<'a> {
     // let address = &e.register_contract_wasm(None, defindex_factory::WASM);
     let address = &e.register(defindex_factory::WASM, ());
     DeFindexFactoryClient::new(e, address)
@@ -52,9 +52,16 @@ fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> 
 
 // TOKEN RELATED FUNCTIONS
 pub(crate) fn create_token_contract<'a>(e: &Env, admin: &Address) -> SorobanTokenClient<'a> {
-    SorobanTokenClient::new(e,&e.register_stellar_asset_contract_v2(admin.clone()).address())
+    SorobanTokenClient::new(
+        e,
+        &e.register_stellar_asset_contract_v2(admin.clone())
+            .address(),
+    )
 }
-pub(crate) fn get_token_admin_client<'a>(e: &Env,address: &Address) -> SorobanTokenAdminClient<'a> {
+pub(crate) fn get_token_admin_client<'a>(
+    e: &Env,
+    address: &Address,
+) -> SorobanTokenAdminClient<'a> {
     SorobanTokenAdminClient::new(e, address)
 }
 
@@ -81,8 +88,7 @@ pub(crate) fn get_token_admin_client<'a>(e: &Env,address: &Address) -> SorobanTo
 // }
 
 pub struct TrustlessManagerTest<'a> {
-// pub struct TrustlessManagerTest {
-
+    // pub struct TrustlessManagerTest {
     env: Env,
     defindex_factory: Address,
     defindex_vault: DeFindexVaultClient<'a>,
@@ -92,16 +98,16 @@ pub struct TrustlessManagerTest<'a> {
     token_1_admin_client: SorobanTokenAdminClient<'a>,
     token_1: SorobanTokenClient<'a>,
     token_1_admin: Address,
-//     emergency_manager: Address,
-//     vault_fee_receiver: Address,
-//     defindex_protocol_receiver: Address,
-//     manager: Address,
-//     strategy_client_token_0: HodlStrategyClient<'a>,
-//     strategy_client_token_1: HodlStrategyClient<'a>,
+    //     emergency_manager: Address,
+    //     vault_fee_receiver: Address,
+    //     defindex_protocol_receiver: Address,
+    //     manager: Address,
+    //     strategy_client_token_0: HodlStrategyClient<'a>,
+    //     strategy_client_token_1: HodlStrategyClient<'a>,
 }
 
 impl<'a> TrustlessManagerTest<'a> {
-// impl TrustlessManagerTest {
+    // impl TrustlessManagerTest {
     fn setup() -> Self {
         let env = Env::default();
         // env.mock_all_auths();
@@ -110,10 +116,10 @@ impl<'a> TrustlessManagerTest<'a> {
         let defindex_factory = Address::generate(&env);
         let defindex_vault = create_defindex_vault(&env);
 
-//         let emergency_manager = Address::generate(&env);
-//         let vault_fee_receiver = Address::generate(&env);
-//         let defindex_protocol_receiver = Address::generate(&env);
-//         let manager = Address::generate(&env);
+        //         let emergency_manager = Address::generate(&env);
+        //         let vault_fee_receiver = Address::generate(&env);
+        //         let defindex_protocol_receiver = Address::generate(&env);
+        //         let manager = Address::generate(&env);
 
         let token_0_admin = Address::generate(&env);
         let token_0 = create_token_contract(&env, &token_0_admin);
@@ -124,27 +130,13 @@ impl<'a> TrustlessManagerTest<'a> {
         let token_0_admin_client = get_token_admin_client(&env, &token_0.address.clone());
         let token_1_admin_client = get_token_admin_client(&env, &token_1.address.clone());
 
-//         // token_1_admin_client.mint(to, amount);
+        //         // token_1_admin_client.mint(to, amount);
 
-//         let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
-//         let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
+        //         let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
+        //         let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
 
-<<<<<<< HEAD
-//         env.budget().reset_unlimited();
-
-//         DeFindexVaultTest {
-//             env,
-//             defindex_factory,
-//             defindex_contract,
-//             token0_admin_client,
-//             token0,
-//             token0_admin,
-//             token1_admin_client,
-//             token1,
-//             token1_admin,
-=======
         env.budget().reset_unlimited();
-        
+
         TrustlessManagerTest {
             env,
             defindex_factory,
@@ -155,23 +147,22 @@ impl<'a> TrustlessManagerTest<'a> {
             token_1_admin_client,
             token_1,
             token_1_admin,
->>>>>>> 4a0331b6b89974e1c6eb5b89b3d9a6717650bb89
-//             emergency_manager,
-//             vault_fee_receiver,
-//             defindex_protocol_receiver,
-//             manager,
-//             strategy_client_token_0,
-//             strategy_client_token_1,
+            //             emergency_manager,
+            //             vault_fee_receiver,
+            //             defindex_protocol_receiver,
+            //             manager,
+            //             strategy_client_token_0,
+            //             strategy_client_token_1,
         }
     }
 
-//     pub(crate) fn generate_random_users(e: &Env, users_count: u32) -> vec::Vec<Address> {
-//         let mut users = vec![];
-//         for _c in 0..users_count {
-//             users.push(Address::generate(e));
-//         }
-//         users
-//     }
+    //     pub(crate) fn generate_random_users(e: &Env, users_count: u32) -> vec::Vec<Address> {
+    //         let mut users = vec![];
+    //         for _c in 0..users_count {
+    //             users.push(Address::generate(e));
+    //         }
+    //         users
+    //     }
 }
 
 // mod vault;
