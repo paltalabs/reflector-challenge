@@ -8,10 +8,10 @@ mod storage;
 use storage::{extend_instance_ttl, set_initialized};
 
 #[contract]
-struct ReflectoyChallenge;
+struct ReflectorChallenge;
 
 #[contractimpl]
-impl ReflectoyChallenge {
+impl ReflectorChallenge {
     fn __constructor(e: Env, asset_ratios: Vec<AssetRatio>) {
         set_initialized(&e);
     }
