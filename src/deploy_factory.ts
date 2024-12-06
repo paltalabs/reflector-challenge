@@ -15,7 +15,7 @@ const network = process.argv[2];
 
 const toolkit = toolkitLoader.getNetworkToolkit("testnet");
 
-export async function deployHdolStrategy() {
+export async function deployFactory() {
   if (network != "mainnet") await airdropAccount(toolkit, toolkit.admin);
   let account = await toolkit.horizonRpc.loadAccount(toolkit.admin.publicKey());
   console.log("publicKey", toolkit.admin.publicKey());
@@ -47,7 +47,7 @@ export async function deployHdolStrategy() {
 
 async function main() {
   try {
-    await deployHdolStrategy();
+    await deployFactory();
     toolkit.addressBook.writeToFile();
   } catch (e) {
     console.error(e);
