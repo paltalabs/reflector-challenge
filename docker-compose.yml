@@ -1,6 +1,6 @@
 services:
   paltalabs-reflector-challenge:
-    image: esteblock/soroban-preview:22.0.1@sha256:9abf8af74a019150b99638beba38059bc1488e47d4869f746b59aee711f0c1b7
+    image: esteblock/soroban-preview:22.0.1@sha256:8cc9cffca10b64e3e9b528a9ebb8ed8c154df5f39c835eb804e81edb8206593e
     container_name: paltalabs-reflector-challenge
     volumes:
       - .:/workspace
