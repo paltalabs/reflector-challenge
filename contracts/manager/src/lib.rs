@@ -3,9 +3,11 @@ use crate::model::AssetRatio;
 use model::Config;
 use soroban_sdk::{contract, contractimpl, Address, Env, String, Vec};
 
-mod model;
-mod storage;
-mod oracle;
+pub mod model;
+pub mod oracle;
+pub mod storage;
+pub mod utils;
+pub mod vault;
 
 use storage::{extend_instance_ttl, get_config, set_config};
 
@@ -37,10 +39,12 @@ impl ReflectorChallenge {
         String::from_str(&e, "Rebalance")
     }
 
-
     // TEMP METHODS FOR TESTING
     pub fn get_price(e: Env) -> i128 {
         let asset_ratio = get_config(&e).asset_ratios.get(0).unwrap();
         oracle::get_price(&e, &asset_ratio)
     }
 }
+
+#[cfg(test)]
+mod test;
