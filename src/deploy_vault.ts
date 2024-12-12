@@ -14,15 +14,10 @@ import {
 } from "soroban-toolkit";
 import { randomBytes } from "crypto";
 
-const network = process.argv[2];
-
 const toolkit = toolkitLoader.getNetworkToolkit("testnet");
-const soroban_token = new Address(toolkit.addressBook.getContractId("XRP"));
-
-let xlmContractId: string = Asset.native().contractId(toolkit.passphrase);
 
 export async function deployVaults() {
-  if (network != "mainnet") await airdropAccount(toolkit, toolkit.admin);
+  await airdropAccount(toolkit, toolkit.admin);
   let account = await toolkit.horizonRpc.loadAccount(toolkit.admin.publicKey());
   console.log("publicKey", toolkit.admin.publicKey());
   let balance = account.balances.filter((item) => item.asset_type == "native");
@@ -59,7 +54,7 @@ export async function deployVaults() {
     return xdr.ScVal.scvMap([
       new xdr.ScMapEntry({
         key: xdr.ScVal.scvSymbol("address"),
-        val: nativeToScVal(asset.address),
+        val: new Address(asset.address).toScVal(),
       }),
       new xdr.ScMapEntry({
         key: xdr.ScVal.scvSymbol("strategies"),
@@ -120,6 +115,10 @@ export async function deployVaults() {
     "🚀 « DeFindex Vault created with address:",
     scValToNative(result.returnValue)
   );
+
+  toolkit.addressBook.setContractId("vault", scValToNative(result.returnValue));
+  toolkit.addressBook.writeToFile();
+
   return scValToNative(result.returnValue);
 }
 
