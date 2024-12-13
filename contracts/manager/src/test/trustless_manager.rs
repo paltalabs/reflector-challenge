@@ -55,8 +55,8 @@ fn trustless_manager_works() {
 
     // We set an original price for each token
     // XLM is 0.5 USD, XRP is 2.5 USD
-    let token_0_price = 5000000;
-    let token_1_price = 25000000;
+    let xlm_price = 5000000;
+    let xrp_price = 25000000;
 
     let ledger_info = test.env.ledger().get();
     test.env.ledger().set(LedgerInfo {
@@ -68,8 +68,8 @@ fn trustless_manager_works() {
     test.reflector.set_price(
         &sorobanvec![
             &test.env, 
-            normalize_price(token_0_price), 
-            normalize_price(token_1_price)], 
+            normalize_price(xlm_price), 
+            normalize_price(xrp_price)], 
         &timestamp); //milisegundos
 
     // A user wants to invest 500 USD worth of XLM and 500 USD worth of XRP
@@ -117,30 +117,93 @@ fn trustless_manager_works() {
     assert_eq!(total_managed_funds, total_managed_funds_expected);
     
 
+    // 3 DORITOS LATER
+    let ledger_info = test.env.ledger().get();
+    test.env.ledger().set(LedgerInfo {
+        timestamp: 1000,
+        ..ledger_info
+    });
+
+    // NOW THE ORACLE CHANGED ITS VALUE
+    // NOW XLM PUMPED X 10 ! Oh my god!
+    // XRP pumped only x 2
+    // so now they have the same price!
+
+    let xlm_price = 50000000;
+    let xrp_price = 50000000;
     
-   
+    let timestamp = 1000_000;
+    test.reflector.set_price(
+        &sorobanvec![
+            &test.env, 
+            normalize_price(xlm_price), 
+            normalize_price(xrp_price)], 
+        &timestamp); 
 
-    // let total_managed_funds = test.defindex_contract.total_managed_funds();
-    // assert_eq!(total_managed_funds, 500 + 500);
+    // we check the new prices
+    let last_price_xlm = test.reflector.lastprice(
+        &Asset::Other(Symbol::new(&test.env, "XLM")));
+    assert_ne!(last_price_xlm, None);
+    assert_eq!(
+        last_price_xlm,
+        Some(PriceData {
+            price: normalize_price(xlm_price),
+            timestamp: convert_to_seconds(1000_000),
+        })
+    );
+    let last_price_xrp = test.reflector.lastprice(
+        &Asset::Other(Symbol::new(&test.env, "XRP")));
+    assert_ne!(last_price_xrp, None);
+    assert_eq!(
+        last_price_xrp,
+        Some(PriceData {
+            price: normalize_price(xrp_price),
+            timestamp: convert_to_seconds(1000_000),
+        })
+    );
+    
+    /*
+        The vault had 2,000*0.5=1,000 USD in XLM and 400*2.5= 1,000 USD in XRP
+        Now the vault has 
+        2000*5=10,000 USD in XLM
+        400*5= 2,000 USD in XRP
+        Total 12,000 USD.
+        This should be splited in 6,000 USD in XLM and 6,000 USD in XRP
+        6,000/5=1,200 XLM
+        6,000/5=1,200 XRP
+    */
 
-    // let token_0_price = 2000;
-    // let token_1_price = 2400;
+    // THE MAGIC MOMENT, REBALANCING USING TRUSTLESS MANAGER
+    let rebalance = test.trustless_manager.rebalance();
 
-    // let timestamp = 900_000;
-    // test.reflector.set_price(
-    //     &sorobanvec![
-    //         &test.env, 
-    //         normalize_price(token_0_price), 
-    //         normalize_price(token_1_price)], 
-    //     &timestamp); //milisegundos
+    // check the new total managed funds
+    let mut total_managed_funds_expected = Map::new(&test.env);
+    let strategy_investments_expected_token_0 = sorobanvec![&test.env, StrategyAllocation {
+        strategy_address: test.strategy_client_token_0.address.clone(),
+        amount: 6000_0_000_000i128,
+    }];
+    let strategy_investments_expected_token_1 = sorobanvec![&test.env, StrategyAllocation {
+        strategy_address: test.strategy_client_token_1.address.clone(),
+        amount: 6000_0_000_000i128,
+    }];
+    total_managed_funds_expected.set(test.token_0.address.clone(),
+    CurrentAssetInvestmentAllocation {
+        asset: test.token_0.address.clone(),
+        total_amount: 6000_0_000_000i128,
+        idle_amount: 0,
+        invested_amount: 6000_0_000_000i128,
+        strategy_allocations: strategy_investments_expected_token_0,
+    });
+    total_managed_funds_expected.set(test.token_1.address.clone(),
+    CurrentAssetInvestmentAllocation {
+        asset: test.token_1.address.clone(),
+        total_amount: 6000_0_000_000i128,
+        idle_amount: 0,
+        invested_amount: 6000_0_000_000i128,
+        strategy_allocations: strategy_investments_expected_token_1,
+    });
 
-    // let rebalance = test.trustless_manager.rebalance();
-    // assert_eq!(rebalance, "Rebalance");
+    let total_managed_funds = test.defindex_vault.fetch_total_managed_funds();
+    assert_eq!(total_managed_funds, total_managed_funds_expected);
 
-    // let total_managed_funds = test.defindex_contract.total_managed_funds();
-    // assert_eq!(total_managed_funds, 2480 + 2480);
-    // let balance_0 = test.token_0.balance(&test.users[0]);
-    // let balance_1 = test.token_1.balance(&test.users[0]);
-    // assert_eq!(balance_0, 1240);
-    // assert_eq!(balance_1, 600
 }
