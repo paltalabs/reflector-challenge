@@ -80,12 +80,14 @@ fn create_defindex_factory<'a>(
     admin: &Address, 
     defindex_receiver: &Address, 
     defindex_fee: &u32,
+    aggregator: &Address,
     defindex_wasm_hash: &BytesN<32>) -> DeFindexFactoryClient<'a> {
 
     let args = (
         admin.clone(), 
         defindex_receiver.clone(), 
         defindex_fee.clone(), 
+        aggregator.clone(),
         defindex_wasm_hash.clone());
     let address = &e.register(defindex_factory::WASM, args);
     DeFindexFactoryClient::new(e, address)
@@ -236,6 +238,7 @@ impl<'a> TrustlessManagerTest<'a> {
             &admin, 
             &defindex_receiver, 
             &100u32, 
+            &soroswap_aggregator.address,
             &defindex_vault_wasm_hash);        
             
         // HODL STRATEGIES
