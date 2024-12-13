@@ -1,6 +1,5 @@
 use soroban_sdk::{
-    Env, BytesN, Address,
-    testutils::{Address as _}
+    testutils::Address as _, vec, Address, BytesN, Env, String
 };
 
 fn pair_contract_wasm(e: &Env) -> BytesN<32> {
@@ -51,4 +50,28 @@ pub fn create_soroswap_pool<'a>(e: &Env, router: &SoroswapRouterClient, to: &Add
         &to, 
         &(e.ledger().timestamp() + 3600)
     )
+}
+
+// SoroswapRouter Contract
+mod aggregator {
+    soroban_sdk::contractimport!(file = "../soroswap_aggregator.wasm");
+    pub type SoroswapAggregatorClient<'a> = Client<'a>;
+}
+pub use aggregator::{SoroswapAggregatorClient, Adapter};
+
+pub fn create_soroswap_aggregator<'a>(e: &Env, admin: &Address, router: &Address) -> SoroswapAggregatorClient<'a> {
+    let aggregator_address = &e.register(aggregator::WASM, ());
+    let aggregator = SoroswapAggregatorClient::new(e, aggregator_address);
+    
+    let adapter_vec = vec![
+        e,
+        Adapter {
+            protocol_id: String::from_str(e, "soroswap"),
+            address: router.clone(),
+            paused: false,
+        }
+    ];
+
+    aggregator.initialize(&admin, &adapter_vec);    
+    aggregator
 }

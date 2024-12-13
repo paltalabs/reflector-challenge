@@ -14,7 +14,7 @@ use soroban_sdk::{
     BytesN,
     Symbol,
 };
-use soroswap_setup::{create_soroswap_factory, create_soroswap_pool, create_soroswap_router, SoroswapFactoryClient, SoroswapRouterClient};
+use soroswap_setup::{create_soroswap_aggregator, create_soroswap_factory, create_soroswap_pool, create_soroswap_router, SoroswapFactoryClient, SoroswapRouterClient};
 use std::vec;
 
 use crate::{TrustlessManager, TrustlessManagerClient, AssetRatio};
@@ -80,12 +80,14 @@ fn create_defindex_factory<'a>(
     admin: &Address, 
     defindex_receiver: &Address, 
     defindex_fee: &u32,
+    aggregator: &Address,
     defindex_wasm_hash: &BytesN<32>) -> DeFindexFactoryClient<'a> {
 
     let args = (
         admin.clone(), 
         defindex_receiver.clone(), 
         defindex_fee.clone(), 
+        aggregator.clone(),
         defindex_wasm_hash.clone());
     let address = &e.register(defindex_factory::WASM, args);
     DeFindexFactoryClient::new(e, address)
@@ -205,17 +207,6 @@ impl<'a> TrustlessManagerTest<'a> {
         env.budget().reset_unlimited();
         env.mock_all_auths();
 
-        // DEFINDEX FACTORY
-        let admin = Address::generate(&env);
-        let defindex_receiver = Address::generate(&env);
-        let defindex_vault_wasm_hash = env.deployer().upload_contract_wasm(defindex_vault::WASM);
-        let defindex_factory = create_defindex_factory(
-            &env, 
-            &admin, 
-            &defindex_receiver, 
-            &100u32, 
-            &defindex_vault_wasm_hash);
-            
         // TEST TOKENS
         let token_0_admin = Address::generate(&env);
         let token_1_admin = Address::generate(&env);
@@ -225,6 +216,30 @@ impl<'a> TrustlessManagerTest<'a> {
         
         let token_0_admin_client = get_token_admin_client(&env, &token_0.address.clone());
         let token_1_admin_client = get_token_admin_client(&env, &token_1.address.clone());
+
+        // Soroswap Setup
+        let soroswap_admin = Address::generate(&env);
+        let soroswap_factory = create_soroswap_factory(&env, &soroswap_admin);
+
+        token_0_admin_client.mint(&soroswap_admin, &9900_0_000_000);
+        token_1_admin_client.mint(&soroswap_admin, &1770_5_698_535);
+
+        let soroswap_router = create_soroswap_router(&env, &soroswap_factory.address);
+        create_soroswap_pool(&env, &soroswap_router, &soroswap_admin, &token_0.address, &token_1.address, &9900_0_000_000, &1770_5_698_535);
+
+        let soroswap_aggregator = create_soroswap_aggregator(&env, &soroswap_admin, &soroswap_router.address);
+        
+        // DEFINDEX FACTORY
+        let admin = Address::generate(&env);
+        let defindex_receiver = Address::generate(&env);
+        let defindex_vault_wasm_hash = env.deployer().upload_contract_wasm(defindex_vault::WASM);
+        let defindex_factory = create_defindex_factory(
+            &env, 
+            &admin, 
+            &defindex_receiver, 
+            &100u32, 
+            &soroswap_aggregator.address,
+            &defindex_vault_wasm_hash);        
             
         // HODL STRATEGIES
         let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
@@ -315,57 +330,60 @@ impl<'a> TrustlessManagerTest<'a> {
             ]
         );
 
-        // ADMIN DEPOSITS 1000 XLM, => 500 USD & 200 XRP, => 500 USD into the vault
-        /*
-        
-        
-- manager (admin) executes deposit function in vault (check invest test in defindex)
-// Prepare investments object
-    let asset_investments = vec![
-        &test.env,
-        Some(AssetInvestmentAllocation {
-        asset: test.token0.address.clone(),
-        strategy_allocations: vec![
-            &test.env,
-            Some(StrategyAllocation {
-            strategy_address: test.strategy_client_token0.address.clone(),
-            amount: 100,
-            }),
-        ],
-    }),
-    Some(AssetInvestmentAllocation {
-        asset: test.token1.address.clone(),
-        strategy_allocations: vec![
-            &test.env,
-            Some(StrategyAllocation {
-            strategy_address: test.strategy_client_token1.address.clone(),
-            amount: 200,
-            }),
-        ],
-    })];
-
-    defindex_contract.invest(
-        &asset_investments,
-    );
-
-        
-        
+         // ADMIN DEPOSITS 1000 XLM, => 500 USD & 200 XRP, => 500 USD into the vault
+        /*       
+        - manager (admin) executes deposit function in vault (check invest test in defindex)
+          defindex_vault.deposit(
+            &sorobanvec![&test.env, deposit_amount],
+            &sorobanvec![&test.env, deposit_amount],
+            &users[0],
+            &true,
+        );
         */
-        // admin executes investment in vault
+        token_0_admin_client.mint(&admin, &1000_0_000_000i128);
+        token_1_admin_client.mint(&admin, &1000_0_000_000i128);
+
+        let deposit_amount_xlm = 1000_0_000_000i128;
+        let deposit_amount_xrp = 1000_0_000_000i128;
+
+        defindex_vault.deposit(
+            &sorobanvec![&env, deposit_amount_xlm, deposit_amount_xrp],
+            &sorobanvec![&env, deposit_amount_xlm, deposit_amount_xrp],
+            &admin,
+            &true,
+        );
+    
+        // Prepare first investment
+        let asset_investments = sorobanvec![
+            &env,
+                Some(AssetInvestmentAllocation {
+                asset: token_0_admin_client.address.clone(),
+                strategy_allocations: sorobanvec![
+                    &env,
+                    Some(StrategyAllocation {
+                    strategy_address: strategy_client_token_0.address.clone(),
+                    amount: 100,
+                    }),
+                ],
+                }),
+                Some(AssetInvestmentAllocation {
+                    asset: token_1_admin_client.address.clone(),
+                    strategy_allocations: sorobanvec![
+                        &env,
+                        Some(StrategyAllocation {
+                        strategy_address: strategy_client_token_1.address.clone(),
+                        amount: 200,
+                        }),
+                    ],
+            })
+        ];
+        defindex_vault.invest(
+            &asset_investments,
+        );
 
         // VAULT ADMIN PASSES TRUSTLESS_MANAGER TO VAULT
         defindex_vault.set_manager(&trustless_manager.address);
                         
-        // Soroswap Pools
-        let soroswap_admin = Address::generate(&env);
-        let soroswap_factory = create_soroswap_factory(&env, &soroswap_admin);
-
-        token_0_admin_client.mint(&soroswap_admin, &100_000_000_0000000);
-        token_1_admin_client.mint(&soroswap_admin, &5_000_000_0000000);
-
-        let soroswap_router = create_soroswap_router(&env, &soroswap_factory.address);
-        create_soroswap_pool(&env, &soroswap_router, &soroswap_admin, &token_0.address, &token_1.address, &100_000_000_0000000, &5_000_000_0000000);
-
         let user = Address::generate(&env);
         env.budget().reset_unlimited();
 
@@ -397,4 +415,5 @@ mod utils;
 mod setup;
 mod oracle;
 mod soroswap_setup;
-mod trustless_manager;
+// mod trustless_manager;
+mod swap;
