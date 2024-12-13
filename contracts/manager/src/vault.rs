@@ -11,3 +11,9 @@ pub fn execute_rebalance(e: &Env, config: Config, instructions: Vec<Instruction>
 
     vault_client.rebalance(&instructions)
 }
+
+pub fn fetch_total_managed_funds(e: &Env, config: Config) -> Map<Address, CurrentAssetInvestmentAllocation> {
+    let vault_client = VaultClient::new(e, &config.vault);
+
+    vault_client.fetch_total_managed_funds()
+}
