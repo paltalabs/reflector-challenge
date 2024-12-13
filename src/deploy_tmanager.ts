@@ -1,4 +1,4 @@
-import { Address, Asset, xdr } from "@stellar/stellar-sdk";
+import { Address, Asset, nativeToScVal, xdr } from "@stellar/stellar-sdk";
 import { toolkitLoader } from "./toolkit";
 import {
   airdropAccount,
@@ -20,62 +20,44 @@ async function deployTManager() {
   console.log("Deploying Trustless Manager");
   console.log("-------------------------------------------------------");
 
-  const assetRatios = [
+  const assetRatiosRaw = [
     {
       asset: toolkit.addressBook.getContractId("XRP"),
       symbol: "XRP",
       ratio: 1,
     },
     {
-      asset: toolkit.addressBook.getContractId("XLM"),
+      asset: Asset.native().contractId(toolkit.passphrase),
       symbol: "XLM",
       ratio: 1,
     },
   ];
 
-  // const assetAllocations = assets.map((asset) => {
-  //   return xdr.ScVal.scvMap([
-  //     new xdr.ScMapEntry({
-  //       key: xdr.ScVal.scvSymbol("address"),
-  //       val: asset.address.toScVal(),
-  //     }),
-  //     new xdr.ScMapEntry({
-  //       key: xdr.ScVal.scvSymbol("strategies"),
-  //       val: xdr.ScVal.scvVec(
-  //         asset.strategies.map((strategy) =>
-  //           xdr.ScVal.scvMap([
-  //             new xdr.ScMapEntry({
-  //               key: xdr.ScVal.scvSymbol("address"),
-  //               val: new Address(strategy.address).toScVal(),
-  //             }),
-  //             new xdr.ScMapEntry({
-  //               key: xdr.ScVal.scvSymbol("name"),
-  //               val: nativeToScVal(strategy.name, { type: "string" }),
-  //             }),
-  //             new xdr.ScMapEntry({
-  //               key: xdr.ScVal.scvSymbol("paused"),
-  //               val: nativeToScVal(false, { type: "bool" }),
-  //             }),
-  //           ])
-  //         )
-  //       ),
-  //     }),
-  //   ]);
-  // });
+  const assetRatios = assetRatiosRaw.map((asset) => {
+    return xdr.ScVal.scvMap([
+      new xdr.ScMapEntry({
+        key: xdr.ScVal.scvSymbol("asset"),
+        val: new Address(asset.asset).toScVal(),
+      }),
+      new xdr.ScMapEntry({
+        key: xdr.ScVal.scvSymbol("ratio"),
+        val: nativeToScVal(asset.ratio, { type: "i128" }),
+      }),
+      new xdr.ScMapEntry({
+        key: xdr.ScVal.scvSymbol("symbol"),
+        val: nativeToScVal(asset.symbol, { type: "string" }),
+      }),
+    ]);
+  });
 
   await installContract(toolkit, "tmanager");
-  await deployContract(
-    toolkit,
-    "tmanager",
-    "tmanager",
-    [
-      new Address(toolkit.addressBook.getContractId("vault")).toScVal(),
-      new Address(
-        "CCYOZJCOPG34LLQQ7N24YXBM7LL62R7ONMZ3G6WZAAYPB5OYKOMJRN63"
-      ).toScVal(),
-    ],
-    toolkit.admin
-  );
+  await deployContract(toolkit, "tmanager", "tmanager", [
+    new Address(toolkit.addressBook.getContractId("vault")).toScVal(),
+    new Address(
+      "CCYOZJCOPG34LLQQ7N24YXBM7LL62R7ONMZ3G6WZAAYPB5OYKOMJRN63"
+    ).toScVal(),
+    xdr.ScVal.scvVec(assetRatios),
+  ]);
 }
 
 deployTManager();
