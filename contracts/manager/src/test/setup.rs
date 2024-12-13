@@ -1,5 +1,15 @@
 // Testing that the test is correctly seted up XD
-use crate::test::{TrustlessManagerTest};
+use soroban_sdk::{
+    // testutils::Address as _, 
+    vec as sorobanvec, 
+    // Address, 
+    // Env, 
+    // String, 
+    // Val, 
+    // Vec, 
+    // BytesN
+};
+use crate::test::{TrustlessManagerTest, Asset, ConfigData};
 
 #[test]
 fn test_setup() {
@@ -26,6 +36,12 @@ fn test_setup() {
     assert_eq!(test.strategy_client_token_0.asset(), test.token_0.address);
     assert_eq!(test.strategy_client_token_1.asset(), test.token_1.address);
 
-
+    // check expected assets from reflector
+    let assets = test.reflector.assets();
+    let expected_assets = sorobanvec![
+        &test.env,
+        Asset::Stellar(test.token_0.address.clone()),
+        Asset::Stellar(test.token_1.address.clone())
+    ];
 
 }

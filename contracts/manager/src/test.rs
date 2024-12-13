@@ -40,6 +40,24 @@ use defindex_vault::{DeFindexVaultClient, Strategy};
 use hodl_strategy::HodlStrategyClient;
 use reflector::ReflectorClient;
 
+pub use reflector::{ConfigData, Asset};
+// // The configuration parameters for the contract.
+// pub struct ConfigData {
+//     // The admin address.
+//     pub admin: Address,
+//     // The retention period for the prices.
+//     pub period: u64,
+//     // The assets supported by the contract.
+//     pub assets: Vec<Asset>,
+//     // The base asset for the prices.
+//     pub base_asset: Asset,
+//     // The number of decimals for the prices.
+//     pub decimals: u32,
+//     // The resolution of the prices.
+//     pub resolution: u32,
+// }
+
+
 
 // fn create_strategy_contract<'a>(e: &Env, asset: &Address, init_args: &Vec<Val>) -> StrategyContractClient<'a> {
 //     let args = (asset.clone(), init_args.clone());
@@ -83,9 +101,30 @@ fn create_hodl_strategy<'a>(
     let hodl_strategy = HodlStrategyClient::new(e, address);
     hodl_strategy
 }
-fn create_reflector<'a>(e: &Env) -> ReflectorClient<'a> {
+fn create_reflector<'a>(
+    e: &Env,
+    config_data: &ConfigData
+) -> ReflectorClient<'a> {
     let address = &e.register(reflector::WASM, ());
-    ReflectorClient::new(e, address)
+    let reflector_client = ReflectorClient::new(e, address);
+    reflector_client.config(config_data);
+    reflector_client
+
+    // pub fn config(e: Env, config: ConfigData) {
+    //     config.admin.require_auth();
+    //     if e.is_initialized() {
+    //         e.panic_with_error(Error::AlreadyInitialized);
+    //     }
+    //     e.set_admin(&config.admin);
+    //     e.set_base_asset(&config.base_asset);
+    //     e.set_decimals(config.decimals);
+    //     e.set_resolution(config.resolution);
+    //     e.set_retention_period(config.period);
+
+    //     Self::__add_assets(&e, config.assets);
+    // }
+
+
 }
 
 // THE CONTRACT TO BE TESTED
@@ -157,7 +196,7 @@ pub struct TrustlessManagerTest<'a> {
     defindex_protocol_receiver: Address,
     strategy_client_token_0: HodlStrategyClient<'a>,
     strategy_client_token_1: HodlStrategyClient<'a>,
-    // reflector: ReflectorClient<'a>,
+    reflector: ReflectorClient<'a>,
     // trustless_manager: TrustlessManagerClient<'a>,
     user: Address,
 }
@@ -191,7 +230,50 @@ impl<'a> TrustlessManagerTest<'a> {
         let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
         let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
         
-            // let reflector = create_reflector(&env);
+
+        // REFLECTOR
+        // https://stellar.expert/explorer/public/contract/CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN/storage?durability=instance
+        // assets should be something like this
+        // assets: [["Stellar"sym, token_0.address], ["Stellar"sym, token_1.address]
+
+        // #[contracttype]
+        // The configuration parameters for the contract.
+        // pub struct ConfigData {
+        //     // The admin address.
+        //     pub admin: Address,
+        //     // The retention period for the prices.
+        //     pub period: u64,
+        //     // The assets supported by the contract.
+        //     pub assets: Vec<Asset>,
+        //     // The base asset for the prices.
+        //     pub base_asset: Asset,
+        //     // The number of decimals for the prices.
+        //     pub decimals: u32,
+        //     // The resolution of the prices.
+        //     pub resolution: u32,
+        // }
+
+        // #[derive(Clone, Debug, Eq, PartialEq)]
+        // pub enum Asset {
+        //     Stellar(Address),
+        //     Other(Symbol),
+        // }
+
+
+        let config_data = ConfigData {
+            admin: admin.clone(),
+            period: 86400000,
+            assets: sorobanvec![
+                &env,
+                Asset::Stellar(token_0.address.clone()),
+                Asset::Stellar(token_1.address.clone())
+            ],
+            base_asset: Asset::Stellar(token_0.address.clone()),// This is supposed to be USDC.
+            // in our case not needed to have it
+            decimals: 8,
+            resolution: 8,
+        };
+        let reflector = create_reflector(&env, &config_data);
             // let trustless_manager = create_trustless_manager(&env);
             
             // DEFINDEX PROTOCOL
@@ -221,7 +303,7 @@ impl<'a> TrustlessManagerTest<'a> {
 //             manager,
             strategy_client_token_0,
             strategy_client_token_1,
-            // reflector,
+            reflector,
             // trustless_manager,
             user,
         }
