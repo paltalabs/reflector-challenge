@@ -3,8 +3,6 @@ use crate::vault::{CurrentAssetInvestmentAllocation, Instruction, ActionType, Sw
 use soroban_sdk::{Address, Env, Map, Vec, String};
 use crate::storage::{get_config};
 
-extern crate std;
-use std::println;
 
 pub fn calculate_rebalance(
     e: &Env,
