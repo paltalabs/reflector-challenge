@@ -14,7 +14,7 @@ use soroban_sdk::{
     BytesN,
     Symbol,
 };
-use soroswap_setup::{create_soroswap_factory, create_soroswap_pool, create_soroswap_router, SoroswapFactoryClient, SoroswapRouterClient};
+use soroswap_setup::{create_soroswap_aggregator, create_soroswap_factory, create_soroswap_pool, create_soroswap_router, SoroswapFactoryClient, SoroswapRouterClient};
 use std::vec;
 
 use crate::{TrustlessManager, TrustlessManagerClient, AssetRatio};
@@ -204,17 +204,6 @@ impl<'a> TrustlessManagerTest<'a> {
         env.budget().reset_unlimited();
         env.mock_all_auths();
 
-        // DEFINDEX FACTORY
-        let admin = Address::generate(&env);
-        let defindex_receiver = Address::generate(&env);
-        let defindex_vault_wasm_hash = env.deployer().upload_contract_wasm(defindex_vault::WASM);
-        let defindex_factory = create_defindex_factory(
-            &env, 
-            &admin, 
-            &defindex_receiver, 
-            &100u32, 
-            &defindex_vault_wasm_hash);
-            
         // TEST TOKENS
         let token_0_admin = Address::generate(&env);
         let token_1_admin = Address::generate(&env);
@@ -224,6 +213,29 @@ impl<'a> TrustlessManagerTest<'a> {
         
         let token_0_admin_client = get_token_admin_client(&env, &token_0.address.clone());
         let token_1_admin_client = get_token_admin_client(&env, &token_1.address.clone());
+
+        // Soroswap Setup
+        let soroswap_admin = Address::generate(&env);
+        let soroswap_factory = create_soroswap_factory(&env, &soroswap_admin);
+
+        token_0_admin_client.mint(&soroswap_admin, &9900_0_000_000);
+        token_1_admin_client.mint(&soroswap_admin, &1770_5_698_535);
+
+        let soroswap_router = create_soroswap_router(&env, &soroswap_factory.address);
+        create_soroswap_pool(&env, &soroswap_router, &soroswap_admin, &token_0.address, &token_1.address, &9900_0_000_000, &1770_5_698_535);
+
+        let soroswap_aggregator = create_soroswap_aggregator(&env, &soroswap_admin, &soroswap_router.address);
+        
+        // DEFINDEX FACTORY
+        let admin = Address::generate(&env);
+        let defindex_receiver = Address::generate(&env);
+        let defindex_vault_wasm_hash = env.deployer().upload_contract_wasm(defindex_vault::WASM);
+        let defindex_factory = create_defindex_factory(
+            &env, 
+            &admin, 
+            &defindex_receiver, 
+            &100u32, 
+            &defindex_vault_wasm_hash);        
             
         let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
         let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
@@ -313,16 +325,6 @@ impl<'a> TrustlessManagerTest<'a> {
             ]
         );
                         
-        // Soroswap Pools
-        let soroswap_admin = Address::generate(&env);
-        let soroswap_factory = create_soroswap_factory(&env, &soroswap_admin);
-
-        token_0_admin_client.mint(&soroswap_admin, &100_000_000_0000000);
-        token_1_admin_client.mint(&soroswap_admin, &5_000_000_0000000);
-
-        let soroswap_router = create_soroswap_router(&env, &soroswap_factory.address);
-        create_soroswap_pool(&env, &soroswap_router, &soroswap_admin, &token_0.address, &token_1.address, &100_000_000_0000000, &5_000_000_0000000);
-
         let user = Address::generate(&env);
         env.budget().reset_unlimited();
 
@@ -353,3 +355,4 @@ impl<'a> TrustlessManagerTest<'a> {
 mod utils;
 mod setup;
 mod soroswap_setup;
+mod swap;
