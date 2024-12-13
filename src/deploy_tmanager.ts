@@ -45,7 +45,7 @@ async function deployTManager() {
       }),
       new xdr.ScMapEntry({
         key: xdr.ScVal.scvSymbol("symbol"),
-        val: nativeToScVal(asset.symbol, { type: "string" }),
+        val: xdr.ScVal.scvSymbol(asset.symbol),
       }),
     ]);
   });

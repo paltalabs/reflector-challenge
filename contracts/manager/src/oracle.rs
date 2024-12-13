@@ -1,6 +1,6 @@
-use soroban_sdk::{Env, Symbol, Address};
+use soroban_sdk::{panic_with_error, Address, Env, Symbol};
 
-use crate::{model::AssetRatio, storage::get_config};
+use crate::{error::ContractError, model::AssetRatio, storage::get_config};
 
 soroban_sdk::contractimport!(
     file = "../reflector.wasm"
@@ -17,7 +17,7 @@ pub fn get_price(e: &Env, oracle: Address, symbol: Symbol) -> i128 {
 
     match price {
         None => {
-            panic!("Price not found for asset: {:?}", "XRP");
+            panic_with_error!(e, ContractError::GetPriceError);
         }
         Some(price) => {
             price.price
