@@ -10,4 +10,22 @@ fn test_setup() {
   
     assert_eq!(factory_admin, test.admin);
     assert_eq!(factory_defindex_receiver, test.defindex_receiver);
+
+    // Mint tokens to user
+    let amount = 987654321;
+    test.token_0_admin_client.mint(&test.user, &amount);
+    test.token_1_admin_client.mint(&test.user, &amount);
+
+    // check balances
+    let balance_0 = test.token_0.balance(&test.user);
+    let balance_1 = test.token_1.balance(&test.user);
+    assert_eq!(balance_0, amount);
+    assert_eq!(balance_1, amount);
+
+    // check hodl strategy correclty set up
+    assert_eq!(test.strategy_client_token_0.asset(), test.token_0.address);
+    assert_eq!(test.strategy_client_token_1.asset(), test.token_1.address);
+
+
+
 }

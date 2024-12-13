@@ -40,35 +40,42 @@ use defindex_vault::{DeFindexVaultClient, Strategy};
 use hodl_strategy::HodlStrategyClient;
 use reflector::ReflectorClient;
 
-// Deploy Contracts
-// fn create_defindex_vault<'a>(e: &Env) -> DeFindexVaultClient<'a> {
-//     // let address = &e.register_contract_wasm(None, defindex_vault::WASM);
+
+// fn create_strategy_contract<'a>(e: &Env, asset: &Address, init_args: &Vec<Val>) -> StrategyContractClient<'a> {
 //     let args = (asset.clone(), init_args.clone());
 
 //     let address = &e.register(hodl_strategy::WASM, args);
-//     let address = &e.register(defindex_vault::WASM, ());
-//     DeFindexVaultClient::new(e, address)
-// }
-// fn create_defindex_factory<'a>(e: &Env, admin: &Address, defindex_receiver: &Address, defindex_fee: u32, defindex_wasm_hash: &BytesN<32>) -> DeFindexFactoryClient<'a> {
-//     let args = (admin, defindex_receiver, defindex_fee, defindex_wasm_hash);
-//     DeFindexFactoryClient::new(e, &e.register(DeFindexFactory, args))
-// }
+//     let strategy = StrategyContractClient::new(e, address); 
+//     strategy
+// }  
+
+// Deploy Contracts
 fn create_defindex_factory<'a>(
     e: &Env, 
     admin: &Address, 
     defindex_receiver: &Address, 
-    defindex_fee: u32,
+    defindex_fee: &u32,
     defindex_wasm_hash: &BytesN<32>) -> DeFindexFactoryClient<'a> {
     
+    // fn __constructor(
+    //     e: Env, 
+    //     admin: Address,
+    //     defindex_receiver: Address,
+    //     defindex_fee: u32,
+    //     vault_wasm_hash: BytesN<32>
+    // );
+    
     let args = (
-        admin, 
-        defindex_receiver, 
-        defindex_fee, 
-        defindex_wasm_hash);
-    let address = &e.register(defindex_factory::WASM, ());
+        admin.clone(), 
+        defindex_receiver.clone(), 
+        defindex_fee.clone(), 
+        defindex_wasm_hash.clone());
+    let address = &e.register(defindex_factory::WASM, args);
     DeFindexFactoryClient::new(e, address)
 }
-fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> {
+fn create_hodl_strategy<'a>(
+    e: &Env, 
+    asset: &Address) -> HodlStrategyClient<'a> {
     let init_args: Vec<Val> = sorobanvec![&e];
     let args = (asset, init_args);
 
@@ -150,8 +157,9 @@ pub struct TrustlessManagerTest<'a> {
     defindex_protocol_receiver: Address,
     strategy_client_token_0: HodlStrategyClient<'a>,
     strategy_client_token_1: HodlStrategyClient<'a>,
-    reflector: ReflectorClient<'a>,
-    trustless_manager: TrustlessManagerClient<'a>,
+    // reflector: ReflectorClient<'a>,
+    // trustless_manager: TrustlessManagerClient<'a>,
+    user: Address,
 }
 
 impl<'a> TrustlessManagerTest<'a> {
@@ -163,11 +171,11 @@ impl<'a> TrustlessManagerTest<'a> {
         let admin = Address::generate(&env);
         let defindex_receiver = Address::generate(&env);
         let defindex_vault_wasm_hash = env.deployer().upload_contract_wasm(defindex_vault::WASM);
-        let factory_contract = create_defindex_factory(
+        let defindex_factory = create_defindex_factory(
             &env, 
             &admin, 
             &defindex_receiver, 
-            100u32, 
+            &100u32, 
             &defindex_vault_wasm_hash);
             
         // TEST TOKENS
@@ -180,11 +188,11 @@ impl<'a> TrustlessManagerTest<'a> {
         let token_0_admin_client = get_token_admin_client(&env, &token_0.address.clone());
         let token_1_admin_client = get_token_admin_client(&env, &token_1.address.clone());
             
-            let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
-            let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
-            
-            let reflector = create_reflector(&env);
-            let trustless_manager = create_trustless_manager(&env);
+        let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
+        let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
+        
+            // let reflector = create_reflector(&env);
+            // let trustless_manager = create_trustless_manager(&env);
             
             // DEFINDEX PROTOCOL
             
@@ -192,7 +200,9 @@ impl<'a> TrustlessManagerTest<'a> {
             let vault_fee_receiver = Address::generate(&env);
             let defindex_protocol_receiver = Address::generate(&env);
             let manager = Address::generate(&env);
-        env.budget().reset_unlimited();
+
+            let user = Address::generate(&env);
+            env.budget().reset_unlimited();
         TrustlessManagerTest {
             env,
             defindex_factory,
@@ -211,8 +221,9 @@ impl<'a> TrustlessManagerTest<'a> {
 //             manager,
             strategy_client_token_0,
             strategy_client_token_1,
-            reflector,
-            trustless_manager,
+            // reflector,
+            // trustless_manager,
+            user,
         }
     }
 }
