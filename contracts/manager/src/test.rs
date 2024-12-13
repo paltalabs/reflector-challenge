@@ -46,7 +46,7 @@ use reflector::ReflectorClient;
 // USE MODELS
 pub use reflector::{ConfigData, Asset, PriceData};
 pub use defindex_factory::{AssetStrategySet, Strategy};
-pub use defindex_vault::AssetInvestmentAllocation;
+pub use defindex_vault::{AssetInvestmentAllocation, StrategyAllocation};
 
 // // The configuration parameters for the contract.
 // pub struct ConfigData {
