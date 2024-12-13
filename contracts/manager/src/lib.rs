@@ -41,9 +41,23 @@ impl TrustlessManager {
     }
 
     // TEMP METHODS FOR TESTING
-    pub fn get_price(e: Env) -> AssetRatio {
+    pub fn get_prices(e: Env) -> u32 {
         let config = get_config(&e);
-        config.asset_ratios.get(0).unwrap()
-        // oracle::get_price(&e)
+        // let oracle_address = config.oracle.clone();
+        // let asset_ratios = config.asset_ratios.clone();
+
+        // asset_ratios.get_unchecked(0).symbol
+
+        config.asset_ratios.len()
+
+        // let mut prices = Vec::new(&e);
+
+        // let oracle_address = config.oracle.clone();
+        // for asset_ratio in config.asset_ratios.iter() {
+        //     let price = oracle::get_price(&e, oracle_address.clone(), asset_ratio.symbol);
+        //     prices.push_back(price);
+        // }
+
+        // prices
     }
 }

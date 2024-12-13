@@ -30,8 +30,9 @@ async function testTManager() {
   const priceResult: any = await invokeContract(
     toolkit,
     "tmanager",
-    "get_price",
-    []
+    "get_prices",
+    [],
+    true
   );
   console.log("🚀 « priceResult:", priceResult);
   console.log("Price Result:", scValToNative(priceResult.result.retval));

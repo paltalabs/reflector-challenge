@@ -1,4 +1,4 @@
-use soroban_sdk::{Env, Symbol};
+use soroban_sdk::{Env, Symbol, Address};
 
 use crate::{model::AssetRatio, storage::get_config};
 
@@ -8,12 +8,10 @@ soroban_sdk::contractimport!(
 
 pub type OracleClient<'a> = Client<'a>;
 
-pub fn get_price(e: &Env) -> i128 {
-    let config = get_config(e);
+pub fn get_price(e: &Env, oracle: Address, symbol: Symbol) -> i128 {
+    let oracle_client = OracleClient::new(&e, &oracle);
 
-    let oracle_client = OracleClient::new(&e, &config.oracle);
-
-    let asset = Asset::Other(Symbol::new(&e, "XRP"));
+    let asset = Asset::Other(symbol);
 
     let price = oracle_client.lastprice(&asset);
 
