@@ -2,7 +2,6 @@ import { Address, Asset, Keypair, nativeToScVal, scValToNative, xdr } from "@ste
 import { toolkitLoader } from "./toolkit";
 import { invokeContract, airdropAccount } from "soroban-toolkit";
 
-
 const args = process.argv.slice(2);
 if(args.length !== 1){
   console.error("Usage: yarn start <network>");
@@ -97,7 +96,9 @@ async function main() {
 
   const invested_funds_after_investment = await invokeContract(toolkit, "vault", "fetch_current_invested_funds", [], true);
   const parsed_invested_funds_after_investment = scValToNative(invested_funds_after_investment.result.retval);
-  console.log(parsed_invested_funds_after_investment)
+  console.log('parsed result',parsed_invested_funds_after_investment)
+
+  const valuesAfterInvest = Object.values(parsed_invested_funds_after_investment);
 
   //Set tmanager as vault manager
   const tmanagerAddress = toolkit.addressBook.getContractId("tmanager");
@@ -110,16 +111,16 @@ async function main() {
 
   const invested_funds_after_rebalance = await invokeContract(toolkit, "vault", "fetch_current_invested_funds", [], true);
   const parsed_invested_funds_after_rebalance = scValToNative(invested_funds_after_rebalance.result.retval);
+  const valuesAfterRebalance = Object.values(parsed_invested_funds_after_rebalance);
 
-  console.log(parsed_invested_funds_after_investment.find((entry: any) => entry[0] === xrp_token)[1])
   console.table({
     XRP:{
-      "Before rebalance": parsed_invested_funds_after_investment,
-      "After rebalance": parsed_invested_funds_after_rebalance[0]
+      "Before rebalance": valuesAfterInvest[0],
+      "After rebalance": valuesAfterRebalance[0]
     },
     XLM:{
-      "Before rebalance": parsed_invested_funds_after_investment[1],
-      "After rebalance": parsed_invested_funds_after_investment[1]
+      "Before rebalance": valuesAfterInvest[1],
+      "After rebalance": valuesAfterRebalance[1]
     }
 
   })
