@@ -313,3 +313,4 @@ impl<'a> TrustlessManagerTest<'a> {
 // mod vault;
 mod utils;
 mod setup;
+mod soroswap_setup;
