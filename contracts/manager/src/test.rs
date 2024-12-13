@@ -46,6 +46,7 @@ use reflector::ReflectorClient;
 // USE MODELS
 pub use reflector::{ConfigData, Asset, PriceData};
 pub use defindex_factory::{AssetStrategySet, Strategy};
+pub use defindex_vault::AssetInvestmentAllocation;
 
 // // The configuration parameters for the contract.
 // pub struct ConfigData {
@@ -225,6 +226,7 @@ impl<'a> TrustlessManagerTest<'a> {
         let token_0_admin_client = get_token_admin_client(&env, &token_0.address.clone());
         let token_1_admin_client = get_token_admin_client(&env, &token_1.address.clone());
             
+        // HODL STRATEGIES
         let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
         let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
 
@@ -313,6 +315,44 @@ impl<'a> TrustlessManagerTest<'a> {
             ]
         );
 
+        // ADMIN DEPOSITS 1000 XLM, => 500 USD & 200 XRP, => 500 USD into the vault
+        /*
+        
+        
+- manager (admin) executes deposit function in vault (check invest test in defindex)
+// Prepare investments object
+    let asset_investments = vec![
+        &test.env,
+        Some(AssetInvestmentAllocation {
+        asset: test.token0.address.clone(),
+        strategy_allocations: vec![
+            &test.env,
+            Some(StrategyAllocation {
+            strategy_address: test.strategy_client_token0.address.clone(),
+            amount: 100,
+            }),
+        ],
+    }),
+    Some(AssetInvestmentAllocation {
+        asset: test.token1.address.clone(),
+        strategy_allocations: vec![
+            &test.env,
+            Some(StrategyAllocation {
+            strategy_address: test.strategy_client_token1.address.clone(),
+            amount: 200,
+            }),
+        ],
+    })];
+
+    defindex_contract.invest(
+        &asset_investments,
+    );
+
+        
+        
+        */
+        // admin executes investment in vault
+
         // VAULT ADMIN PASSES TRUSTLESS_MANAGER TO VAULT
         defindex_vault.set_manager(&trustless_manager.address);
                         
@@ -357,3 +397,4 @@ mod utils;
 mod setup;
 mod oracle;
 mod soroswap_setup;
+mod trustless_manager;

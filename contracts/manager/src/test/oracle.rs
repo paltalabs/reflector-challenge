@@ -50,7 +50,7 @@ fn test_set_prices() {
             &test.env, 
             normalize_price(token_0_price), 
             normalize_price(token_1_price)], 
-        &timestamp);
+        &timestamp); //milisegundos
 
     let timestamp = 900_000;
     test.reflector.set_price(
