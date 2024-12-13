@@ -73,7 +73,9 @@ fn create_defindex_factory<'a>(
     let address = &e.register(defindex_factory::WASM, args);
     DeFindexFactoryClient::new(e, address)
 }
-fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> {
+fn create_hodl_strategy<'a>(
+    e: &Env, 
+    asset: &Address) -> HodlStrategyClient<'a> {
     let init_args: Vec<Val> = sorobanvec![&e];
     let args = (asset, init_args);
 
@@ -153,8 +155,8 @@ pub struct TrustlessManagerTest<'a> {
     emergency_manager: Address,
     vault_fee_receiver: Address,
     defindex_protocol_receiver: Address,
-    // strategy_client_token_0: HodlStrategyClient<'a>,
-    // strategy_client_token_1: HodlStrategyClient<'a>,
+    strategy_client_token_0: HodlStrategyClient<'a>,
+    strategy_client_token_1: HodlStrategyClient<'a>,
     // reflector: ReflectorClient<'a>,
     // trustless_manager: TrustlessManagerClient<'a>,
     user: Address,
@@ -186,9 +188,9 @@ impl<'a> TrustlessManagerTest<'a> {
         let token_0_admin_client = get_token_admin_client(&env, &token_0.address.clone());
         let token_1_admin_client = get_token_admin_client(&env, &token_1.address.clone());
             
-            // let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
-            // let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
-            
+        let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
+        let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
+        
             // let reflector = create_reflector(&env);
             // let trustless_manager = create_trustless_manager(&env);
             
@@ -217,8 +219,8 @@ impl<'a> TrustlessManagerTest<'a> {
             vault_fee_receiver,
             defindex_protocol_receiver,
 //             manager,
-            // strategy_client_token_0,
-            // strategy_client_token_1,
+            strategy_client_token_0,
+            strategy_client_token_1,
             // reflector,
             // trustless_manager,
             user,

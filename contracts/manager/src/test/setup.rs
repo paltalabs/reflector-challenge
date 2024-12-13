@@ -22,5 +22,10 @@ fn test_setup() {
     assert_eq!(balance_0, amount);
     assert_eq!(balance_1, amount);
 
+    // check hodl strategy correclty set up
+    assert_eq!(test.strategy_client_token_0.asset(), test.token_0.address);
+    assert_eq!(test.strategy_client_token_1.asset(), test.token_1.address);
+
+
 
 }
