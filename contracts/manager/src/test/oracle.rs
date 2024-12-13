@@ -71,36 +71,13 @@ fn test_set_prices() {
             timestamp: convert_to_seconds(900_000),
         })
     );
-    // // pub struct PriceData {
-    //     // The price in contracts' base asset and decimals.
-    //     pub price: i128,
-    //     // The timestamp of the price.
-    //     pub timestamp: u64,
-    // }
     
-//     let expected_price_data = PriceData {
-//         price: token_0_price,
-//         timestamp: current_time,
-//     };
-//     // assert_eq!(last_price_xlm, Some(expected_price_data));
+    // get prices from trustless manager
+    // pub fn get_prices(e: Env) -> Vec<i128> {
+    let prices = test.trustless_manager.get_prices();
+    assert_eq!(prices, 
+        sorobanvec![&test.env, 
+        normalize_price(token_0_price), 
+        normalize_price(token_1_price)]);
 
-
-//     // tes price at specific timestamp
-//     // pub fn price(e: Env, asset: Asset, timestamp: u64) -> Option<PriceData> {
-//     let price_xlm = test.reflector.price(&Asset::Other(Symbol::new(&test.env, "XLM")), &current_time);
-//     assert_eq!(price_xlm, Some(expected_price_data));
-// // 
-
-
-
-    
-    
-    // .prices(&Asset::Stellar(test.token_0.address), &1u32);
-    // prices is some
-    // assert_eq!(prices_is, token_0_price);
-
-    // let prices = test.trustless_manager.get_prices();
-    // assert_eq!(prices.len(), 2);
-    // assert_eq!(prices.get(0).unwrap(), token_0_price);
-    // assert_eq!(prices[1], token_1_price);
 }
