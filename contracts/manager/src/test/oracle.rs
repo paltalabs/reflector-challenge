@@ -9,16 +9,10 @@ use soroban_sdk::{
     // Vec, 
     // BytesN
 };
-use crate::test::{TrustlessManagerTest, Asset, ConfigData, PriceData};
+use crate::test::{TrustlessManagerTest, Asset, ConfigData, PriceData, normalize_price, convert_to_seconds};
 use soroban_sdk::{testutils::{Ledger, LedgerInfo}};
 
-const DECIMALS: u32 = 14;
-fn normalize_price(price: i128) -> i128 {
-    price * 10i128.pow(DECIMALS)
-}
-fn convert_to_seconds(timestamp: u64) -> u64 {
-    timestamp / 1000
-}
+
 
 // TEST THAT WE CAN SET PRICES IN THE ORACLE AND THAT WE CAN READ THEM ON THE TRUSTLESS MANAGER
 #[test]

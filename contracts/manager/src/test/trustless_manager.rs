@@ -2,7 +2,7 @@ use soroban_sdk::{
     vec as sorobanvec,
     Symbol,
 };
-use crate::test::{TrustlessManagerTest, Asset, ConfigData, PriceData};
+use crate::test::{TrustlessManagerTest, Asset, ConfigData, PriceData, normalize_price, convert_to_seconds};
 use soroban_sdk::{testutils::{Ledger, LedgerInfo}};
 
 /*
@@ -54,27 +54,24 @@ fn trustless_manager_works() {
         ..ledger_info
     });
 
-    // let timestamp = 600_000;
-    // test.reflector.set_price(
-    //     &sorobanvec![
-    //         &test.env, 
-    //         normalize_price(token_0_price), 
-    //         normalize_price(token_1_price)], 
-    //     &timestamp); //milisegundos
+    let timestamp = 600_000;
+    test.reflector.set_price(
+        &sorobanvec![
+            &test.env, 
+            normalize_price(token_0_price), 
+            normalize_price(token_1_price)], 
+        &timestamp); //milisegundos
 
-    // let amount_0 = 1000;
-    // let amount_1 = 200;
-    // test.defindex_contract.deposit(
-    //     &sorobanvec![&test.env, amount_0, amount_1], // asset 0
-    //     &sorobanvec![&test.env, amount_0, amount_1], // asset 1 
-    //     &test.users[0],
-    //     &true,
-    // );
+    let deposit_amount_xlm = 1000_0_000_000i128;
+    let deposit_amount_xrp = 200_0_000_000i128;
+    test.defindex_vault.deposit(
+        &sorobanvec![&test.env, deposit_amount_xlm, deposit_amount_xrp], // asset 0
+        &sorobanvec![&test.env, deposit_amount_xlm, deposit_amount_xrp], // asset 1 
+        &test.user,
+        &true,
+    );
 
-    // let balance_0 = test.token_0.balance(&test.users[0]);
-    // let balance_1 = test.token_1.balance(&test.users[0]);
-    // assert_eq!(balance_0, amount_0);
-    // assert_eq!(balance_1, amount_1);
+   
 
     // let total_managed_funds = test.defindex_contract.total_managed_funds();
     // assert_eq!(total_managed_funds, 500 + 500);

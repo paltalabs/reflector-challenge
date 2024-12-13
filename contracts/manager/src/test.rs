@@ -46,7 +46,7 @@ use reflector::ReflectorClient;
 // USE MODELS
 pub use reflector::{ConfigData, Asset, PriceData};
 pub use defindex_factory::{AssetStrategySet, Strategy};
-pub use defindex_vault::{AssetInvestmentAllocation, StrategyAllocation};
+pub use defindex_vault::{AssetInvestmentAllocation, StrategyAllocation, CurrentAssetInvestmentAllocation};
 
 // // The configuration parameters for the contract.
 // pub struct ConfigData {
@@ -178,6 +178,14 @@ pub(crate) fn generate_random_users(e: &Env, users_count: u32) -> vec::Vec<Addre
             users.push(Address::generate(e));
         }
         users
+}
+
+const DECIMALS: u32 = 14;
+pub fn normalize_price(price: i128) -> i128 {
+    price * 10i128.pow(DECIMALS)
+}
+pub fn convert_to_seconds(timestamp: u64) -> u64 {
+    timestamp / 1000
 }
 
 pub struct TrustlessManagerTest<'a> {
@@ -415,5 +423,5 @@ mod utils;
 mod setup;
 mod oracle;
 mod soroswap_setup;
-// mod trustless_manager;
+mod trustless_manager;
 mod swap;
