@@ -2,6 +2,7 @@
 use soroban_sdk::{
     // testutils::Address as _, 
     vec as sorobanvec, 
+    Symbol,
     // Address, 
     // Env, 
     // String, 
@@ -40,9 +41,10 @@ fn test_setup() {
     let assets = test.reflector.assets();
     let expected_assets = sorobanvec![
         &test.env,
-        Asset::Stellar(test.token_0.address.clone()),
-        Asset::Stellar(test.token_1.address.clone())
+        Asset::Other(Symbol::new(&test.env, "XLM")),
+        Asset::Other(Symbol::new(&test.env, "XRP")),
     ];
+    assert_eq!(assets, expected_assets);
 
     // check that the vault manager is the trustless manager contract
     let vault_manager = test.defindex_vault.get_manager();

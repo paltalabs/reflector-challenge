@@ -43,7 +43,7 @@ use hodl_strategy::HodlStrategyClient;
 use reflector::ReflectorClient;
 
 // USE MODELS
-pub use reflector::{ConfigData, Asset};
+pub use reflector::{ConfigData, Asset, PriceData};
 pub use defindex_factory::{AssetStrategySet, Strategy};
 
 // // The configuration parameters for the contract.
@@ -279,9 +279,9 @@ impl<'a> TrustlessManagerTest<'a> {
             admin: admin.clone(),
             period: 86400000,
             assets: sorobanvec![
-                &env,
-                Asset::Stellar(token_0.address.clone()),
-                Asset::Stellar(token_1.address.clone())
+                &env,    
+                Asset::Other(Symbol::new(&env, "XLM")),
+                Asset::Other(Symbol::new(&env, "XRP")),
             ],
             base_asset: Asset::Stellar(token_0.address.clone()),// This is supposed to be USDC.
             // in our case not needed to have it
@@ -340,3 +340,4 @@ impl<'a> TrustlessManagerTest<'a> {
 // mod vault;
 mod utils;
 mod setup;
+mod oracle;
