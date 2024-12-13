@@ -1,4 +1,5 @@
 use crate::model::Config;
+use crate::model::AssetPrice;
 use crate::vault::CurrentAssetInvestmentAllocation;
 use crate::vault::Instruction;
 use soroban_sdk::{Address, Env, Map, Vec};
@@ -6,6 +7,7 @@ use soroban_sdk::{Address, Env, Map, Vec};
 pub fn calculate_rebalance(
     e: &Env,
     current_allocations: Map<Address, CurrentAssetInvestmentAllocation>,
+    prices: Vec<AssetPrice>
 ) -> Vec<Instruction> {
     // Create a vector to store rebalancing instructions
     let instructions = Vec::new(e);

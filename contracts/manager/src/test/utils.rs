@@ -1,4 +1,4 @@
-use crate::model::Config;
+use crate::model::{Config, AssetPrice};
 use crate::vault::{CurrentAssetInvestmentAllocation, Instruction, StrategyAllocation};
 use soroban_sdk::{testutils::Address as _, Address, Env, Map, Vec};
 
@@ -12,8 +12,8 @@ use super::super::utils::calculate_rebalance;
 fn test_calculate_rebalance_empty_allocations() {
     let env = Env::default();
     let current_allocations: Map<Address, CurrentAssetInvestmentAllocation> = Map::new(&env);
-
-    let instructions = calculate_rebalance(&env, current_allocations);
+    let asset_prices: Vec<AssetPrice> = Vec::new(&env);
+    let instructions = calculate_rebalance(&env, current_allocations, asset_prices);
     assert_eq!(instructions.len(), 0);
 }
 
@@ -82,6 +82,8 @@ fn test_calculate_rebalance_multiple_assets() {
     current_allocations.set(token_XRP, allocation1);
     current_allocations.set(token_XLM, allocation2);
 
-    let instructions = calculate_rebalance(&env, current_allocations);
+    let asset_prices: Vec<AssetPrice> = Vec::new(&env);
+
+    let instructions = calculate_rebalance(&env, current_allocations, asset_prices);
     assert_eq!(instructions.len(), 0); // For now, since implementation returns empty vec
 }
