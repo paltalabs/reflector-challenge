@@ -14,7 +14,14 @@ fn test_calculate_rebalance_empty_allocations() {
     let current_allocations: Map<Address, CurrentAssetInvestmentAllocation> = Map::new(&env);
     let asset_prices: Vec<AssetPrice> = Vec::new(&env);
     let asset_ratios: Vec<AssetRatio> = Vec::new(&env);
-    let instructions = calculate_rebalance(&env, current_allocations, asset_prices, asset_ratios);
+    let instructions = calculate_rebalance(
+        &env, 
+        current_allocations, 
+        asset_prices, 
+        asset_ratios,
+        Address::generate(&env),
+        Address::generate(&env),
+    );
     assert_eq!(instructions.len(), 0);
 }
 
@@ -117,7 +124,14 @@ fn test_calculate_rebalance_multiple_assets() {
             }
         ]
     );
-    let instructions = calculate_rebalance(&env, current_allocations, prices, ratios);
+    let instructions = calculate_rebalance(
+        &env, 
+        current_allocations, 
+        prices, 
+        ratios,
+        Address::generate(&env),
+        Address::generate(&env),
+    );
 
     println!("instructions: {:?}", instructions);
 

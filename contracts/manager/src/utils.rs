@@ -8,7 +8,9 @@ pub fn calculate_rebalance(
     e: &Env,
     current_allocations: Map<Address, CurrentAssetInvestmentAllocation>,
     prices: Vec<AssetPrice>,
-    ratios: Vec<AssetRatio>
+    ratios: Vec<AssetRatio>,
+    router: Address,
+    pair: Address,
 ) -> Vec<Instruction> {
 // ) -> Map<Address, i128> {
     // Create a vector to store rebalancing instructions
@@ -36,7 +38,7 @@ pub fn calculate_rebalance(
         total_weight,
     );
 
-    let instructions = create_swap_instructions(&e, &deviations, &prices);
+    let instructions = create_swap_instructions(&e, &deviations, &prices, &router, &pair);
     // Build instructions 
     // deviations
     instructions
@@ -101,6 +103,8 @@ fn create_swap_instructions(
     env: &Env,
     deviations: &Map<Address, i128>,
     prices: &Vec<AssetPrice>,
+    router: &Address,
+    pair: &Address,
 ) -> Vec<Instruction> {
     let mut instructions: Vec<Instruction> = Vec::new(env);
 
@@ -138,6 +142,8 @@ fn create_swap_instructions(
             amount_out_min: 0, // Placeholder, can be estimated based on price slippage
             distribution,
             deadline: env.ledger().timestamp() + 3600u64, // 10 minutes from now
+            router: router.clone(),
+            pair: pair.clone(),
         };
 
         // Create instruction

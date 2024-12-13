@@ -67,6 +67,8 @@ fn test_swap() {
                 amount_out_min: 0,
                 distribution: distribution_vec,
                 deadline: test.env.ledger().timestamp() + 3600u64,
+                router: test.soroswap_router.address.clone(),
+                pair: test.soroswap_pair.clone(),
             }),
             swap_details_exact_out: OptionalSwapDetailsExactOut::None,
         },
