@@ -13,7 +13,7 @@ pub struct AssetRatio {
 pub struct AssetPrice {
     pub asset: Address,
     pub symbol: Symbol,
-    pub ratio: i128,
+    pub price: i128,
 }
 
 #[contracttype]
