@@ -44,8 +44,9 @@ use hodl_strategy::HodlStrategyClient;
 use reflector::ReflectorClient;
 
 // USE MODELS
-pub use reflector::{ConfigData, Asset};
+pub use reflector::{ConfigData, Asset, PriceData};
 pub use defindex_factory::{AssetStrategySet, Strategy};
+pub use defindex_vault::AssetInvestmentAllocation;
 
 // // The configuration parameters for the contract.
 // pub struct ConfigData {
@@ -237,6 +238,7 @@ impl<'a> TrustlessManagerTest<'a> {
             &100u32, 
             &defindex_vault_wasm_hash);        
             
+        // HODL STRATEGIES
         let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
         let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
 
@@ -294,9 +296,9 @@ impl<'a> TrustlessManagerTest<'a> {
             admin: admin.clone(),
             period: 86400000,
             assets: sorobanvec![
-                &env,
-                Asset::Stellar(token_0.address.clone()),
-                Asset::Stellar(token_1.address.clone())
+                &env,    
+                Asset::Other(Symbol::new(&env, "XLM")),
+                Asset::Other(Symbol::new(&env, "XRP")),
             ],
             base_asset: Asset::Stellar(token_0.address.clone()),// This is supposed to be USDC.
             // in our case not needed to have it
@@ -324,6 +326,47 @@ impl<'a> TrustlessManagerTest<'a> {
                 },
             ]
         );
+
+        // ADMIN DEPOSITS 1000 XLM, => 500 USD & 200 XRP, => 500 USD into the vault
+        /*
+        
+        
+- manager (admin) executes deposit function in vault (check invest test in defindex)
+// Prepare investments object
+    let asset_investments = vec![
+        &test.env,
+        Some(AssetInvestmentAllocation {
+        asset: test.token0.address.clone(),
+        strategy_allocations: vec![
+            &test.env,
+            Some(StrategyAllocation {
+            strategy_address: test.strategy_client_token0.address.clone(),
+            amount: 100,
+            }),
+        ],
+    }),
+    Some(AssetInvestmentAllocation {
+        asset: test.token1.address.clone(),
+        strategy_allocations: vec![
+            &test.env,
+            Some(StrategyAllocation {
+            strategy_address: test.strategy_client_token1.address.clone(),
+            amount: 200,
+            }),
+        ],
+    })];
+
+    defindex_contract.invest(
+        &asset_investments,
+    );
+
+        
+        
+        */
+        // admin executes investment in vault
+
+        // VAULT ADMIN PASSES TRUSTLESS_MANAGER TO VAULT
+        defindex_vault.set_manager(&trustless_manager.address);
                         
         let user = Address::generate(&env);
         env.budget().reset_unlimited();
@@ -354,5 +397,7 @@ impl<'a> TrustlessManagerTest<'a> {
 // mod vault;
 mod utils;
 mod setup;
+mod oracle;
 mod soroswap_setup;
+mod trustless_manager;
 mod swap;
