@@ -228,7 +228,7 @@ impl<'a> TrustlessManagerTest<'a> {
 
         // Soroswap Setup
         let soroswap_admin = Address::generate(&env);
-        
+
         token_0_admin_client.mint(&soroswap_admin, &9900_0_000_000);
         token_1_admin_client.mint(&soroswap_admin, &1770_5_698_535);
 
@@ -392,7 +392,7 @@ impl<'a> TrustlessManagerTest<'a> {
         );
 
         // VAULT ADMIN PASSES TRUSTLESS_MANAGER TO VAULT
-        // defindex_vault.set_manager(&trustless_manager.address);
+        defindex_vault.set_manager(&trustless_manager.address);
                         
         let user = Address::generate(&env);
         env.budget().reset_unlimited();
