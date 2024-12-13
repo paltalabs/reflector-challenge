@@ -44,4 +44,6 @@ fn test_setup() {
         Asset::Stellar(test.token_1.address.clone())
     ];
 
+    let price_quote = test.soroswap_router.get_amounts_out(&test.soroswap_factory.address, &1000_0_000_000i128, &sorobanvec![&test.env, test.token_0.address.clone(), test.token_1.address.clone()]);
+    assert_eq!(price_quote, sorobanvec![&test.env, 1000_0_000_000i128, 49_8_495_030i128]);
 }

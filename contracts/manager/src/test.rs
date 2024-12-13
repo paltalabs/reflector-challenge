@@ -14,6 +14,7 @@ use soroban_sdk::{
     BytesN,
     Symbol,
 };
+use soroswap_setup::{create_soroswap_factory, create_soroswap_pool, create_soroswap_router, SoroswapFactoryClient, SoroswapRouterClient};
 use std::vec;
 
 use crate::{TrustlessManager, TrustlessManagerClient, AssetRatio};
@@ -192,6 +193,8 @@ pub struct TrustlessManagerTest<'a> {
     strategy_client_token_1: HodlStrategyClient<'a>,
     reflector: ReflectorClient<'a>,
     trustless_manager: TrustlessManagerClient<'a>,
+    soroswap_router: SoroswapRouterClient<'a>,
+    soroswap_factory: SoroswapFactoryClient<'a>,
     user: Address,
 }
 
@@ -300,23 +303,28 @@ impl<'a> TrustlessManagerTest<'a> {
                 AssetRatio {
                     asset: token_0.address.clone(),
                     symbol: Symbol::new(&env, "XLM"),
-                    ratio: 500000000000000000,
+                    ratio: 1000,
                 },
                 AssetRatio {
                     asset: token_1.address.clone(),
                     symbol: Symbol::new(&env, "XRP"),
-                    ratio: 500000000000000000,
+                    ratio: 1000,
                 },
             ]
         );
                         
+        // Soroswap Pools
+        let soroswap_admin = Address::generate(&env);
+        let soroswap_factory = create_soroswap_factory(&env, &soroswap_admin);
+
+        token_0_admin_client.mint(&soroswap_admin, &100_000_000_0000000);
+        token_1_admin_client.mint(&soroswap_admin, &5_000_000_0000000);
+
+        let soroswap_router = create_soroswap_router(&env, &soroswap_factory.address);
+        create_soroswap_pool(&env, &soroswap_router, &soroswap_admin, &token_0.address, &token_1.address, &100_000_000_0000000, &5_000_000_0000000);
+
         let user = Address::generate(&env);
         env.budget().reset_unlimited();
-
-
-
-
-
 
         TrustlessManagerTest {
             env,
@@ -334,6 +342,8 @@ impl<'a> TrustlessManagerTest<'a> {
             strategy_client_token_1,
             reflector,
             trustless_manager,
+            soroswap_router,
+            soroswap_factory,
             user,
         }
     }

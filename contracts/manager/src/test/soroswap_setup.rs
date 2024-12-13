@@ -15,7 +15,7 @@ mod factory {
     soroban_sdk::contractimport!(file = "../soroswap_factory.wasm");
     pub type SoroswapFactoryClient<'a> = Client<'a>;
 }
-use factory::SoroswapFactoryClient;
+pub use factory::SoroswapFactoryClient;
 
 pub fn create_soroswap_factory<'a>(e: &Env, setter: &Address) -> SoroswapFactoryClient<'a> {
     let pair_hash = pair_contract_wasm(&e);
@@ -33,17 +33,14 @@ mod router {
 pub use router::SoroswapRouterClient;
 
 // SoroswapRouter Contract
-pub fn create_soroswap_router<'a>(e: &Env) -> SoroswapRouterClient<'a> {
-    let factory = create_soroswap_factory(&e, &soroswap_admin);
+pub fn create_soroswap_router<'a>(e: &Env, factory: &Address) -> SoroswapRouterClient<'a> {
     let router_address = &e.register(router::WASM, ());
     let router = SoroswapRouterClient::new(e, router_address);
-    router.initialize(&factory.address);
+    router.initialize(factory);
     router
 }
  
-pub fn create_soroswap_pool<'a>(e: &Env, router: SoroswapRouterClient, to: &Address, token_a: &Address, token_b: &Address, amount_a: &i128, amount_b: &i128) -> (i128, i128, i128) {
-    let soroswap_admin = Address::generate(&e);
-
+pub fn create_soroswap_pool<'a>(e: &Env, router: &SoroswapRouterClient, to: &Address, token_a: &Address, token_b: &Address, amount_a: &i128, amount_b: &i128) -> (i128, i128, i128) {
     router.add_liquidity(
         token_a, 
         token_b, 
