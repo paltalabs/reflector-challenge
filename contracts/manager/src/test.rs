@@ -51,9 +51,11 @@ fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> 
     let hodl_strategy = HodlStrategyClient::new(e, address);
     hodl_strategy
 }
+
+// THE CONTRACT TO BE TESTED
 fn create_trustless_manager<'a>(e: &Env) -> TrustlessManagerClient<'a> {
     let address = &e.register(TrustlessManager, ());
-    HodlStrategyClient::new(e, address)
+    TrustlessManagerClient::new(e, address)
     
 }
 
