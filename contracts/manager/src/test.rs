@@ -309,14 +309,12 @@ impl<'a> TrustlessManagerTest<'a> {
                 },
             ]
         );
+
+        // VAULT ADMIN PASSES TRUSTLESS_MANAGER TO VAULT
+        defindex_vault.set_manager(&trustless_manager.address);
                         
         let user = Address::generate(&env);
         env.budget().reset_unlimited();
-
-
-
-
-
 
         TrustlessManagerTest {
             env,

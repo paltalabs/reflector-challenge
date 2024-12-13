@@ -44,4 +44,8 @@ fn test_setup() {
         Asset::Stellar(test.token_1.address.clone())
     ];
 
+    // check that the vault manager is the trustless manager contract
+    let vault_manager = test.defindex_vault.get_manager();
+    assert_eq!(vault_manager, test.trustless_manager.address);
+
 }
