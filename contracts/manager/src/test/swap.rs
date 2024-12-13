@@ -79,7 +79,7 @@ fn test_swap() {
     //             token_out: test.token_1.address.clone(),
     //             amount_in: 1000,
     //             amount_out_min: 0,
-    //             distribution: Vec<DexDistribution>,
+    //             distribution: ,
     //             deadline: test.env.ledger().timestamp() + 3600u64,
     //         }),
     //         swap_details_exact_out: OptionalSwapDetailsExactOut::None,
