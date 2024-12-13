@@ -21,3 +21,7 @@ Now you can Swap Tokens on Soroswap in
 https://app.soroswap.finance/swap/CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC/{YOUR DEPLOYED XRP ADDRESS}
 
 Make sure select "Testnet" on your Freighter Wallet
+
+In contracts folder we have:
+- reflector.wasm, compiled from https://github.com/reflector-network/reflector-contract
+
