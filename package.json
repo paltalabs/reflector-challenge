@@ -10,7 +10,9 @@
     "mintAndCreateLP": "ts-node src/mintAndCreateLP.ts",
     "deployHodl": "ts-node src/deploy_hodl.ts",
     "deployFactory": "ts-node src/deploy_factory.ts",
-    "deployVault": "ts-node src/deploy_vault.ts"
+    "deployVault": "ts-node src/deploy_vault.ts",
+    "deployTManager": "ts-node src/deploy_tmanager.ts",
+    "testTManager": "ts-node src/test/test_tmanager.ts"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "^13.0.0",

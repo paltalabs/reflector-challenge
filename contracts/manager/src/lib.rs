@@ -41,8 +41,9 @@ impl ReflectorChallenge {
     }
 
     // TEMP METHODS FOR TESTING
-    pub fn get_price(e: Env) -> i128 {
-        let asset_ratio = get_config(&e).asset_ratios.get(0).unwrap();
-        oracle::get_price(&e, &asset_ratio)
+    pub fn get_price(e: Env) -> AssetRatio {
+        let config = get_config(&e);
+        config.asset_ratios.get(0).unwrap()
+        // oracle::get_price(&e)
     }
 }
