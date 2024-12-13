@@ -1,8 +1,16 @@
 use soroban_sdk::{
     vec as sorobanvec,
     Symbol,
+    Map,
 };
-use crate::test::{TrustlessManagerTest, Asset, ConfigData, PriceData, normalize_price, convert_to_seconds};
+use crate::test::{
+    TrustlessManagerTest, 
+    Asset, 
+    ConfigData, 
+    PriceData,
+    CurrentAssetInvestmentAllocation,
+    StrategyAllocation,
+    normalize_price, convert_to_seconds};
 use soroban_sdk::{testutils::{Ledger, LedgerInfo}};
 
 /*
@@ -45,6 +53,8 @@ now we check the new total managed funds that should be correct
 fn trustless_manager_works() {
     let test = TrustlessManagerTest::setup();
 
+    // We set an original price for each token
+    // XLM is 0.5 USD, XRP is 2.5 USD
     let token_0_price = 5000000;
     let token_1_price = 25000000;
 
@@ -62,8 +72,13 @@ fn trustless_manager_works() {
             normalize_price(token_1_price)], 
         &timestamp); //milisegundos
 
+    // A user wants to invest 500 USD worth of XLM and 500 USD worth of XRP
+    // We need to deposit 1000 XLM and 200 XRP
     let deposit_amount_xlm = 1000_0_000_000i128;
     let deposit_amount_xrp = 200_0_000_000i128;
+    test.token_0_admin_client.mint(&test.user, &deposit_amount_xlm);
+    test.token_1_admin_client.mint(&test.user, &deposit_amount_xrp);
+
     test.defindex_vault.deposit(
         &sorobanvec![&test.env, deposit_amount_xlm, deposit_amount_xrp], // asset 0
         &sorobanvec![&test.env, deposit_amount_xlm, deposit_amount_xrp], // asset 1 
@@ -71,6 +86,38 @@ fn trustless_manager_works() {
         &true,
     );
 
+    // // check total managed funds
+    let mut total_managed_funds_expected = Map::new(&test.env);
+    let strategy_investments_expected_token_0 = sorobanvec![&test.env, StrategyAllocation {
+        strategy_address: test.strategy_client_token_0.address.clone(),
+        amount: 2000_0_000_000i128,
+    }];
+    let strategy_investments_expected_token_1 = sorobanvec![&test.env, StrategyAllocation {
+        strategy_address: test.strategy_client_token_1.address.clone(),
+        amount: 400_0_000_000i128,
+    }];
+    total_managed_funds_expected.set(test.token_0.address.clone(),
+    CurrentAssetInvestmentAllocation {
+        asset: test.token_0.address.clone(),
+        total_amount: 2000_0_000_000i128,
+        idle_amount: 0,
+        invested_amount: 2000_0_000_000i128,
+        strategy_allocations: strategy_investments_expected_token_0,
+    });
+    total_managed_funds_expected.set(test.token_1.address.clone(),
+    CurrentAssetInvestmentAllocation {
+        asset: test.token_1.address.clone(),
+        total_amount: 400_0_000_000i128,
+        idle_amount: 0,
+        invested_amount: 400_0_000_000i128,
+        strategy_allocations: strategy_investments_expected_token_1,
+    });
+
+    let total_managed_funds = test.defindex_vault.fetch_total_managed_funds();
+    assert_eq!(total_managed_funds, total_managed_funds_expected);
+    
+
+    
    
 
     // let total_managed_funds = test.defindex_contract.total_managed_funds();
