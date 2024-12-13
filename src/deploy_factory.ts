@@ -15,6 +15,8 @@ const network = process.argv[2];
 
 const toolkit = toolkitLoader.getNetworkToolkit("testnet");
 
+const aggregatorAddress = network == 'testnet' ? process.env.AGGREGATOR_ADDRESS_TESTNET! : process.env.AGGREGATOR_ADDRESS_MAINNET!;
+
 export async function deployFactory() {
   if (network != "mainnet") await airdropAccount(toolkit, toolkit.admin);
   let account = await toolkit.horizonRpc.loadAccount(toolkit.admin.publicKey());
@@ -33,6 +35,7 @@ export async function deployFactory() {
     new Address(toolkit.admin.publicKey()).toScVal(),
     new Address(toolkit.admin.publicKey()).toScVal(),
     nativeToScVal(50, {type: "u32"}),
+    new Address(aggregatorAddress).toScVal(),
     nativeToScVal(Buffer.from(toolkit.addressBook.getWasmHash("vault"), "hex")),
   ];
   await deployContract(
