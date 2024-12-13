@@ -10,12 +10,12 @@
     "mintAndCreateLP": "ts-node src/mintAndCreateLP.ts",
     "deployHodl": "ts-node src/deploy_hodl.ts",
     "deployFactory": "ts-node src/deploy_factory.ts",
-    "deployVaults": "ts-node src/deploy_vaults.ts"
+    "deployVault": "ts-node src/deploy_vault.ts"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "^13.0.0",
     "dotenv": "^16.4.7",
-    "soroban-toolkit": "^0.1.2"
+    "soroban-toolkit": "^0.1.5"
   },
   "devDependencies": {
     "@types/node": "^20.6.1",

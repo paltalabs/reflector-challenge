@@ -3,7 +3,7 @@ extern crate std;
 use soroban_sdk::token::{
     StellarAssetClient as SorobanTokenAdminClient, TokenClient as SorobanTokenClient,
 };
-use soroban_sdk::{testutils::Address as _, vec as sorobanvec, Address, Env, String, Vec, Val};
+use soroban_sdk::{testutils::Address as _, vec as sorobanvec, Address, Env, String, Val, Vec};
 use std::vec;
 
 use crate::{TrustlessManager, TrustlessManagerClient};
@@ -26,11 +26,10 @@ pub mod reflector {
     pub type ReflectorClient<'a> = Client<'a>;
 }
 
-
 // USE CLIENTS
-use hodl_strategy::HodlStrategyClient;
 use defindex_factory::DeFindexFactoryClient;
 use defindex_vault::{DeFindexVaultClient, Strategy};
+use hodl_strategy::HodlStrategyClient;
 use reflector::ReflectorClient;
 
 // Deploy Contracts
@@ -39,13 +38,13 @@ fn create_defindex_vault<'a>(e: &Env) -> DeFindexVaultClient<'a> {
     let address = &e.register(defindex_vault::WASM, ());
     DeFindexVaultClient::new(e, address)
 }
-fn create_defindex_factory<'a>(e: & Env) -> DeFindexFactoryClient<'a> {
+fn create_defindex_factory<'a>(e: &Env) -> DeFindexFactoryClient<'a> {
     // let address = &e.register_contract_wasm(None, defindex_factory::WASM);
     let address = &e.register(defindex_factory::WASM, ());
     DeFindexFactoryClient::new(e, address)
 }
 fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> {
-    let init_args: Vec<Val>= sorobanvec![&e];
+    let init_args: Vec<Val> = sorobanvec![&e];
     let args = (asset, init_args);
 
     let address = &e.register(hodl_strategy::WASM, args);
@@ -61,15 +60,22 @@ fn create_trustless_manager<'a>(e: &Env) -> TrustlessManagerClient<'a> {
 
 // TOKEN RELATED FUNCTIONS
 pub(crate) fn create_token_contract<'a>(e: &Env, admin: &Address) -> SorobanTokenClient<'a> {
-    SorobanTokenClient::new(e,&e.register_stellar_asset_contract_v2(admin.clone()).address())
+    SorobanTokenClient::new(
+        e,
+        &e.register_stellar_asset_contract_v2(admin.clone())
+            .address(),
+    )
 }
-pub(crate) fn get_token_admin_client<'a>(e: &Env,address: &Address) -> SorobanTokenAdminClient<'a> {
+pub(crate) fn get_token_admin_client<'a>(
+    e: &Env,
+    address: &Address,
+) -> SorobanTokenAdminClient<'a> {
     SorobanTokenAdminClient::new(e, address)
 }
 
 // pub(crate) fn create_strategy_params_token_0(test: &TrustlessManagerTest) -> Vec<Strategy> {
 //     sorobanvec![
-//         &test.env, 
+//         &test.env,
 //         Strategy {
 //             name: String::from_str(&test.env, "Strategy 1"),
 //             address: test.strategy_client_token_0.address.clone(),
@@ -134,7 +140,7 @@ impl<'a> TrustlessManagerTest<'a> {
         let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
 
         env.budget().reset_unlimited();
-        
+
         TrustlessManagerTest {
             env,
             defindex_factory,
@@ -154,13 +160,14 @@ impl<'a> TrustlessManagerTest<'a> {
         }
     }
 
-//     pub(crate) fn generate_random_users(e: &Env, users_count: u32) -> vec::Vec<Address> {
-//         let mut users = vec![];
-//         for _c in 0..users_count {
-//             users.push(Address::generate(e));
-//         }
-//         users
-//     }
+    //     pub(crate) fn generate_random_users(e: &Env, users_count: u32) -> vec::Vec<Address> {
+    //         let mut users = vec![];
+    //         for _c in 0..users_count {
+    //             users.push(Address::generate(e));
+    //         }
+    //         users
+    //     }
 }
 
 // mod vault;
+mod utils;

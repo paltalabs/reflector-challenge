@@ -1,6 +1,6 @@
-use soroban_sdk::{contract, contractimpl, Address, Env, Map};
+use soroban_sdk::{contract, contractimpl, Address, Env, Map, Vec};
 
-soroban_sdk::contractimport!(file = "src/defindex_vault.wasm");
+soroban_sdk::contractimport!(file = "../defindex_vault.wasm");
 
 pub trait VaultTrait {
     fn fetch_total_managed_funds(e: Env) -> Map<Address, CurrentAssetInvestmentAllocation>;

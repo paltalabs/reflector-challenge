@@ -1,8 +1,4 @@
-import {
-  Address,
-  Asset,
-  xdr,
-} from "@stellar/stellar-sdk";
+import { Address, Asset, xdr } from "@stellar/stellar-sdk";
 import { toolkitLoader } from "./toolkit";
 import {
   airdropAccount,
@@ -13,7 +9,7 @@ import {
 const network = process.argv[2];
 
 const toolkit = toolkitLoader.getNetworkToolkit("testnet");
-const soroban_token = new Address(toolkit.addressBook.getContractId("XRP"));
+const xrp_token = new Address(toolkit.addressBook.getContractId("XRP"));
 
 let xlmContractId: string = Asset.native().contractId(toolkit.passphrase);
 
@@ -43,11 +39,10 @@ export async function deployHodlStrategy(
   );
 }
 
-
 async function main() {
   try {
     await deployHodlStrategy("XLM", xlmContractId);
-    await deployHodlStrategy("XRP", soroban_token.toString());
+    await deployHodlStrategy("XRP", xrp_token.toString());
     toolkit.addressBook.writeToFile();
   } catch (e) {
     console.error(e);
