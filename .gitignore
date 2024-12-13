@@ -2,3 +2,4 @@
 .env
 /contract/target/
 .soroban
+*/**/.vscode
