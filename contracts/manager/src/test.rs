@@ -206,6 +206,7 @@ pub struct TrustlessManagerTest<'a> {
     trustless_manager: TrustlessManagerClient<'a>,
     soroswap_router: SoroswapRouterClient<'a>,
     soroswap_factory: SoroswapFactoryClient<'a>,
+    soroswap_pair: Address,
     user: Address,
 }
 
@@ -227,13 +228,14 @@ impl<'a> TrustlessManagerTest<'a> {
 
         // Soroswap Setup
         let soroswap_admin = Address::generate(&env);
-        let soroswap_factory = create_soroswap_factory(&env, &soroswap_admin);
 
         token_0_admin_client.mint(&soroswap_admin, &9900_0_000_000);
         token_1_admin_client.mint(&soroswap_admin, &1770_5_698_535);
 
+        let soroswap_factory = create_soroswap_factory(&env, &soroswap_admin);
         let soroswap_router = create_soroswap_router(&env, &soroswap_factory.address);
         create_soroswap_pool(&env, &soroswap_router, &soroswap_admin, &token_0.address, &token_1.address, &9900_0_000_000, &1770_5_698_535);
+        let soroswap_pair = soroswap_factory.get_pair(&token_0.address, &token_1.address);
 
         let soroswap_aggregator = create_soroswap_aggregator(&env, &soroswap_admin, &soroswap_router.address);
         
@@ -413,6 +415,7 @@ impl<'a> TrustlessManagerTest<'a> {
             trustless_manager,
             soroswap_router,
             soroswap_factory,
+            soroswap_pair,
             user,
         }
     }
