@@ -41,18 +41,6 @@ use hodl_strategy::HodlStrategyClient;
 use reflector::ReflectorClient;
 
 // Deploy Contracts
-// fn create_defindex_vault<'a>(e: &Env) -> DeFindexVaultClient<'a> {
-//     // let address = &e.register_contract_wasm(None, defindex_vault::WASM);
-//     let args = (asset.clone(), init_args.clone());
-
-//     let address = &e.register(hodl_strategy::WASM, args);
-//     let address = &e.register(defindex_vault::WASM, ());
-//     DeFindexVaultClient::new(e, address)
-// }
-// fn create_defindex_factory<'a>(e: &Env, admin: &Address, defindex_receiver: &Address, defindex_fee: u32, defindex_wasm_hash: &BytesN<32>) -> DeFindexFactoryClient<'a> {
-//     let args = (admin, defindex_receiver, defindex_fee, defindex_wasm_hash);
-//     DeFindexFactoryClient::new(e, &e.register(DeFindexFactory, args))
-// }
 fn create_defindex_factory<'a>(
     e: &Env, 
     admin: &Address, 
@@ -152,6 +140,7 @@ pub struct TrustlessManagerTest<'a> {
     strategy_client_token_1: HodlStrategyClient<'a>,
     reflector: ReflectorClient<'a>,
     trustless_manager: TrustlessManagerClient<'a>,
+    user: Address,
 }
 
 impl<'a> TrustlessManagerTest<'a> {
@@ -163,7 +152,7 @@ impl<'a> TrustlessManagerTest<'a> {
         let admin = Address::generate(&env);
         let defindex_receiver = Address::generate(&env);
         let defindex_vault_wasm_hash = env.deployer().upload_contract_wasm(defindex_vault::WASM);
-        let factory_contract = create_defindex_factory(
+        let defindex_factory = create_defindex_factory(
             &env, 
             &admin, 
             &defindex_receiver, 
@@ -192,7 +181,9 @@ impl<'a> TrustlessManagerTest<'a> {
             let vault_fee_receiver = Address::generate(&env);
             let defindex_protocol_receiver = Address::generate(&env);
             let manager = Address::generate(&env);
-        env.budget().reset_unlimited();
+
+            let user = Address::generate(&env);
+            env.budget().reset_unlimited();
         TrustlessManagerTest {
             env,
             defindex_factory,
@@ -213,6 +204,7 @@ impl<'a> TrustlessManagerTest<'a> {
             strategy_client_token_1,
             reflector,
             trustless_manager,
+            user,
         }
     }
 }
