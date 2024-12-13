@@ -4,6 +4,8 @@ Set up the environment variables
 cp .env.example .env
 ```
 
+Fill the .env file with the admin private key and the aggregator address.
+
 Run in this order
 
 ```
