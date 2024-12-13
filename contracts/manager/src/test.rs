@@ -6,6 +6,8 @@ use soroban_sdk::token::{
 use soroban_sdk::{testutils::Address as _, vec as sorobanvec, Address, Env, String, Vec, Val};
 use std::vec;
 
+use crate::{TrustlessManager, TrustlessManagerClient};
+
 // IMPORT WASMS
 pub mod defindex_vault {
     soroban_sdk::contractimport!(file = "../defindex_vault.wasm");
@@ -50,6 +52,12 @@ fn create_hodl_strategy<'a>(e: &Env, asset: &Address) -> HodlStrategyClient<'a> 
     let hodl_strategy = HodlStrategyClient::new(e, address);
     hodl_strategy
 }
+fn create_trustless_manager<'a>(e: &Env) -> TrustlessManagerClient<'a> {
+    let address = &e.register(TrustlessManager, ());
+    HodlStrategyClient::new(e, address)
+    
+}
+
 
 // TOKEN RELATED FUNCTIONS
 pub(crate) fn create_token_contract<'a>(e: &Env, admin: &Address) -> SorobanTokenClient<'a> {
@@ -82,8 +90,6 @@ pub(crate) fn get_token_admin_client<'a>(e: &Env,address: &Address) -> SorobanTo
 // }
 
 pub struct TrustlessManagerTest<'a> {
-// pub struct TrustlessManagerTest {
-
     env: Env,
     defindex_factory: Address,
     defindex_vault: DeFindexVaultClient<'a>,
@@ -93,42 +99,39 @@ pub struct TrustlessManagerTest<'a> {
     token_1_admin_client: SorobanTokenAdminClient<'a>,
     token_1: SorobanTokenClient<'a>,
     token_1_admin: Address,
-//     emergency_manager: Address,
-//     vault_fee_receiver: Address,
-//     defindex_protocol_receiver: Address,
-//     manager: Address,
-//     strategy_client_token_0: HodlStrategyClient<'a>,
-//     strategy_client_token_1: HodlStrategyClient<'a>,
+    emergency_manager: Address,
+    vault_fee_receiver: Address,
+    defindex_protocol_receiver: Address,
+    // manager: Address,
+    strategy_client_token_0: HodlStrategyClient<'a>,
+    strategy_client_token_1: HodlStrategyClient<'a>,
 }
 
 impl<'a> TrustlessManagerTest<'a> {
-// impl TrustlessManagerTest {
     fn setup() -> Self {
         let env = Env::default();
-        // env.mock_all_auths();
+        env.mock_all_auths();
 
-        // Mockup, should be the factory contract
         let defindex_factory = Address::generate(&env);
         let defindex_vault = create_defindex_vault(&env);
 
-//         let emergency_manager = Address::generate(&env);
-//         let vault_fee_receiver = Address::generate(&env);
-//         let defindex_protocol_receiver = Address::generate(&env);
-//         let manager = Address::generate(&env);
+        let emergency_manager = Address::generate(&env);
+        let vault_fee_receiver = Address::generate(&env);
+        let defindex_protocol_receiver = Address::generate(&env);
+        let manager = Address::generate(&env);
 
         let token_0_admin = Address::generate(&env);
-        let token_0 = create_token_contract(&env, &token_0_admin);
-
         let token_1_admin = Address::generate(&env);
+        
+        let token_0 = create_token_contract(&env, &token_0_admin);
         let token_1 = create_token_contract(&env, &token_1_admin);
 
         let token_0_admin_client = get_token_admin_client(&env, &token_0.address.clone());
         let token_1_admin_client = get_token_admin_client(&env, &token_1.address.clone());
 
-//         // token_1_admin_client.mint(to, amount);
 
-//         let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
-//         let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
+        let strategy_client_token_0 = create_hodl_strategy(&env, &token_0.address);
+        let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
 
         env.budget().reset_unlimited();
         
@@ -142,12 +145,12 @@ impl<'a> TrustlessManagerTest<'a> {
             token_1_admin_client,
             token_1,
             token_1_admin,
-//             emergency_manager,
-//             vault_fee_receiver,
-//             defindex_protocol_receiver,
+            emergency_manager,
+            vault_fee_receiver,
+            defindex_protocol_receiver,
 //             manager,
-//             strategy_client_token_0,
-//             strategy_client_token_1,
+            strategy_client_token_0,
+            strategy_client_token_1,
         }
     }
 
