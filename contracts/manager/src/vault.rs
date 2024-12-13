@@ -69,4 +69,6 @@ impl VaultTrait for Vault {
 
         funds_map
     }
+
+    // executes rebalance
 }
