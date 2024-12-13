@@ -11,7 +11,9 @@ use soroban_sdk::{
     String, 
     Val, 
     Vec, 
-    BytesN};
+    BytesN,
+    Symbol,
+};
 use std::vec;
 
 use crate::{TrustlessManager, TrustlessManagerClient, AssetRatio};
@@ -115,18 +117,19 @@ fn create_reflector<'a>(
     reflector_client
 }
 
-// // THE CONTRACT TO BE TESTED
-// fn create_trustless_manager<'a>(
-//     e: &Env,
-//     vault: &Address,
-//     oracle: &Address,
-//     asset_ratios: &Vec<AssetRatio>
-// ) -> TrustlessManagerClient<'a> {
-//     let args = (vault.clone(), oracle.clone(), asset_ratios.clone());
-//     let address = &e.register(TrustlessManager, args);
-//     TrustlessManagerClient::new(e, address)
+// THE CONTRACT TO BE TESTED
+fn create_trustless_manager<'a>(
+    e: &Env,
+    vault: &Address,
+    oracle: &Address,
+    asset_ratios: &Vec<AssetRatio>
+) -> TrustlessManagerClient<'a> {
+    // __constructor(e: Env, vault: Address, oracle: Address, asset_ratios: Vec<AssetRatio>
+    let args = (vault.clone(), oracle.clone(), asset_ratios.clone());
+    let address = &e.register(TrustlessManager, args);
+    TrustlessManagerClient::new(e, address)
     
-// }
+}
 
 // TOKEN RELATED FUNCTIONS
 pub(crate) fn create_token_contract<'a>(e: &Env, admin: &Address) -> SorobanTokenClient<'a> {
@@ -185,13 +188,10 @@ pub struct TrustlessManagerTest<'a> {
     token_1_admin_client: SorobanTokenAdminClient<'a>,
     token_1: SorobanTokenClient<'a>,
     token_1_admin: Address,
-    emergency_manager: Address,
-    vault_fee_receiver: Address,
-    defindex_protocol_receiver: Address,
     strategy_client_token_0: HodlStrategyClient<'a>,
     strategy_client_token_1: HodlStrategyClient<'a>,
     reflector: ReflectorClient<'a>,
-    // trustless_manager: TrustlessManagerClient<'a>,
+    trustless_manager: TrustlessManagerClient<'a>,
     user: Address,
 }
 
@@ -226,7 +226,7 @@ impl<'a> TrustlessManagerTest<'a> {
         let strategy_client_token_1 = create_hodl_strategy(&env, &token_1.address);
 
 
-        // DEFINDEX VAULT
+        // DEFINDEX VAULT WITH ADMIN AS MANAGER
         let token_0_hodl_strategy_set = AssetStrategySet {
             address: token_0.address.clone(),
             strategies: sorobanvec![
@@ -270,34 +270,10 @@ impl<'a> TrustlessManagerTest<'a> {
         let defindex_vault_address = defindex_factory.deployed_defindexes().get(0).unwrap();
         let defindex_vault = DeFindexVaultClient::new(&env, &defindex_vault_address);
         
-        // REFLECTOR
+        // REFLECTOR ORACLE
         // https://stellar.expert/explorer/public/contract/CAFJZQWSED6YAWZU3GWRTOCNPPCGBN32L7QV43XX5LZLFTK6JLN34DLN/storage?durability=instance
         // assets should be something like this
         // assets: [["Stellar"sym, token_0.address], ["Stellar"sym, token_1.address]
-
-        // #[contracttype]
-        // The configuration parameters for the contract.
-        // pub struct ConfigData {
-        //     // The admin address.
-        //     pub admin: Address,
-        //     // The retention period for the prices.
-        //     pub period: u64,
-        //     // The assets supported by the contract.
-        //     pub assets: Vec<Asset>,
-        //     // The base asset for the prices.
-        //     pub base_asset: Asset,
-        //     // The number of decimals for the prices.
-        //     pub decimals: u32,
-        //     // The resolution of the prices.
-        //     pub resolution: u32,
-        // }
-
-        // #[derive(Clone, Debug, Eq, PartialEq)]
-        // pub enum Asset {
-        //     Stellar(Address),
-        //     Other(Symbol),
-        // }
-
 
         let config_data = ConfigData {
             admin: admin.clone(),
@@ -314,19 +290,26 @@ impl<'a> TrustlessManagerTest<'a> {
         };
         let reflector = create_reflector(&env, &config_data);
         
-        // // TRUSTLESS MANAGER  
-        // // __constructor(e: Env, vault: Address, oracle: Address, asset_ratios: Vec<AssetRatio>
-        // let trustless_manager = create_trustless_manager(
-        //     &env,
-        // );
-            
-            // DEFINDEX PROTOCOL
-            
-        let emergency_manager = Address::generate(&env);
-        let vault_fee_receiver = Address::generate(&env);
-        let defindex_protocol_receiver = Address::generate(&env);
-        let manager = Address::generate(&env);
-
+        // TRUSTLESS MANAGER  
+        let trustless_manager = create_trustless_manager(
+            &env,
+            &defindex_vault_address,
+            &reflector.address,
+            &sorobanvec![
+                &env,
+                AssetRatio {
+                    asset: token_0.address.clone(),
+                    symbol: Symbol::new(&env, "XLM"),
+                    ratio: 500000000000000000,
+                },
+                AssetRatio {
+                    asset: token_1.address.clone(),
+                    symbol: Symbol::new(&env, "XRP"),
+                    ratio: 500000000000000000,
+                },
+            ]
+        );
+                        
         let user = Address::generate(&env);
         env.budget().reset_unlimited();
 
@@ -347,14 +330,10 @@ impl<'a> TrustlessManagerTest<'a> {
             token_1_admin_client,
             token_1,
             token_1_admin,
-            emergency_manager,
-            vault_fee_receiver,
-            defindex_protocol_receiver,
-//             manager,
             strategy_client_token_0,
             strategy_client_token_1,
             reflector,
-            // trustless_manager,
+            trustless_manager,
             user,
         }
     }
