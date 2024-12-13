@@ -340,11 +340,11 @@ impl<'a> TrustlessManagerTest<'a> {
             &true,
         );
         */
-        token_0_admin_client.mint(&admin, &1000_0_000_000i128);
-        token_1_admin_client.mint(&admin, &1000_0_000_000i128);
-
+        
         let deposit_amount_xlm = 1000_0_000_000i128;
         let deposit_amount_xrp = 200_0_000_000i128;
+        token_0_admin_client.mint(&admin, &deposit_amount_xlm);
+        token_1_admin_client.mint(&admin, &deposit_amount_xrp);
 
         defindex_vault.deposit(
             &sorobanvec![&env, deposit_amount_xlm, deposit_amount_xrp],
