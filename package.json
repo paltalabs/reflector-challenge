@@ -12,6 +12,7 @@
     "deployFactory": "ts-node src/deploy_factory.ts",
     "deployVault": "ts-node src/deploy_vault.ts",
     "deployTManager": "ts-node src/deploy_tmanager.ts",
+    "deployTestnet": "yarn deployXRPToken testnet && yarn mintAndCreateLP testnet && yarn deployHodl testnet && yarn deployFactory testnet && yarn deployVault testnet && yarn deployTManager testnet",
     "testTManager": "ts-node src/test/test_tmanager.ts"
   },
   "dependencies": {
