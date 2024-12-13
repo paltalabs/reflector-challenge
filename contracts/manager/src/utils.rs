@@ -1,8 +1,6 @@
 use crate::model::{Config,AssetPrice, AssetRatio};
 use crate::vault::{CurrentAssetInvestmentAllocation, Instruction, ActionType, SwapDetailsExactIn, OptionalSwapDetailsExactIn, OptionalSwapDetailsExactOut, DexDistribution };
 use soroban_sdk::{Address, Env, Map, Vec, String};
-use crate::storage::{get_config};
-
 
 pub fn calculate_rebalance(
     e: &Env,
@@ -35,11 +33,18 @@ pub fn calculate_rebalance(
         total_portfolio_value,
         total_weight,
     );
+    let (withdraw_instructions, invest_instructions ) = create_invest_withdraw_instructions(&e, &deviations, &current_allocations);
 
-    let instructions = create_swap_instructions(&e, &deviations, &prices);
+    let swap_instructions = create_swap_instructions(&e, &deviations, &prices);
     // Build instructions 
     // deviations
-    instructions
+    let ordered_instructions = order_instructions(
+        &e,
+        withdraw_instructions,
+        swap_instructions,
+        invest_instructions,
+    );
+    ordered_instructions
 }
 
 fn calculate_total_portfolio_value(
@@ -154,4 +159,74 @@ fn create_swap_instructions(
     }
 
     instructions
+}
+
+fn create_invest_withdraw_instructions(
+    env: &Env,
+    deviations: &Map<Address, i128>,
+    current_allocations: &Map<Address, CurrentAssetInvestmentAllocation>,
+) -> (Vec<Instruction>, Vec<Instruction>) {
+    let mut withdraw_instructions: Vec<Instruction> = Vec::new(env);
+    let mut invest_instructions: Vec<Instruction> = Vec::new(env);
+
+    for (address, deviation) in deviations.iter() {
+        // Get the current allocation for the asset
+        if let Some(allocation) = current_allocations.get(address.clone()) {
+            let action = if deviation > 0 {
+                ActionType::Withdraw
+            } else {
+                ActionType::Invest
+            };
+
+            let amount = deviation.abs();
+
+            // Retrieve the strategy address (we'll use the first one for simplicity)
+            let strategy_address = allocation.strategy_allocations.get(0).map(|sa| sa.strategy_address);
+
+            // Create the instruction
+            let instruction = Instruction {
+                action,
+                strategy: strategy_address,
+                amount: Some(amount),
+                swap_details_exact_in: OptionalSwapDetailsExactIn::None,
+                swap_details_exact_out: OptionalSwapDetailsExactOut::None,
+            };
+
+            // Add to the appropriate list of instructions
+            if action == ActionType::Withdraw {
+                withdraw_instructions.push_back(instruction);
+            } else {
+                invest_instructions.push_back(instruction);
+            }
+        }
+    }
+
+    (withdraw_instructions, invest_instructions)
+}
+
+
+fn order_instructions(
+    env: &Env,
+    withdraw_instructions: Vec<Instruction>,
+    swap_instructions: Vec<Instruction>,
+    invest_instructions: Vec<Instruction>,
+) -> Vec<Instruction> {
+    let mut ordered_instructions: Vec<Instruction> = Vec::new(env);
+
+    // Add withdraw instructions first
+    for instruction in withdraw_instructions.iter() {
+        ordered_instructions.push_back(instruction.clone());
+    }
+
+    // Add swap instructions second
+    for instruction in swap_instructions.iter() {
+        ordered_instructions.push_back(instruction.clone());
+    }
+
+    // Add invest instructions last
+    for instruction in invest_instructions.iter() {
+        ordered_instructions.push_back(instruction.clone());
+    }
+
+    ordered_instructions
 }
