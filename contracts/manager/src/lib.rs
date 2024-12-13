@@ -39,6 +39,14 @@ impl TrustlessManager {
 
     pub fn rebalance(e: Env) -> String {
         extend_instance_ttl(&e);
+
+        // Get Prices
+
+        // get current ratios
+
+        // Get instructions (calculate_rebalance)
+
+        // Execute instructions
         String::from_str(&e, "Rebalance")
     }
 

@@ -10,6 +10,14 @@ pub struct AssetRatio {
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AssetPrice {
+    pub asset: Address,
+    pub symbol: Symbol,
+    pub price: i128,
+}
+
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Config {
     pub vault: Address,
     pub oracle: Address,
