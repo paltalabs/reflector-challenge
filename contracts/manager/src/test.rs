@@ -46,7 +46,7 @@ use reflector::ReflectorClient;
 // USE MODELS
 pub use reflector::{ConfigData, Asset, PriceData};
 pub use defindex_factory::{AssetStrategySet, Strategy};
-pub use defindex_vault::AssetInvestmentAllocation;
+pub use defindex_vault::{AssetInvestmentAllocation, StrategyAllocation};
 
 // // The configuration parameters for the contract.
 // pub struct ConfigData {
@@ -315,43 +315,56 @@ impl<'a> TrustlessManagerTest<'a> {
             ]
         );
 
-        // ADMIN DEPOSITS 1000 XLM, => 500 USD & 200 XRP, => 500 USD into the vault
-        /*
-        
-        
-- manager (admin) executes deposit function in vault (check invest test in defindex)
-// Prepare investments object
-    let asset_investments = vec![
-        &test.env,
-        Some(AssetInvestmentAllocation {
-        asset: test.token0.address.clone(),
-        strategy_allocations: vec![
-            &test.env,
-            Some(StrategyAllocation {
-            strategy_address: test.strategy_client_token0.address.clone(),
-            amount: 100,
-            }),
-        ],
-    }),
-    Some(AssetInvestmentAllocation {
-        asset: test.token1.address.clone(),
-        strategy_allocations: vec![
-            &test.env,
-            Some(StrategyAllocation {
-            strategy_address: test.strategy_client_token1.address.clone(),
-            amount: 200,
-            }),
-        ],
-    })];
-
-    defindex_contract.invest(
-        &asset_investments,
-    );
-
-        
-        
+         // ADMIN DEPOSITS 1000 XLM, => 500 USD & 200 XRP, => 500 USD into the vault
+        /*       
+        - manager (admin) executes deposit function in vault (check invest test in defindex)
+          defindex_vault.deposit(
+            &sorobanvec![&test.env, deposit_amount],
+            &sorobanvec![&test.env, deposit_amount],
+            &users[0],
+            &true,
+        );
         */
-        // admin executes investment in vault
+        token_0_admin_client.mint(&admin, &1000_0_000_000i128);
+        token_1_admin_client.mint(&admin, &1000_0_000_000i128);
+
+        let deposit_amount_xlm = 1000_0_000_000i128;
+        let deposit_amount_xrp = 1000_0_000_000i128;
+
+        defindex_vault.deposit(
+            &sorobanvec![&env, deposit_amount_xlm, deposit_amount_xrp],
+            &sorobanvec![&env, deposit_amount_xlm, deposit_amount_xrp],
+            &admin,
+            &true,
+        );
+    
+        // Prepare first investment
+        let asset_investments = sorobanvec![
+            &env,
+                Some(AssetInvestmentAllocation {
+                asset: token_0_admin_client.address.clone(),
+                strategy_allocations: sorobanvec![
+                    &env,
+                    Some(StrategyAllocation {
+                    strategy_address: strategy_client_token_0.address.clone(),
+                    amount: 100,
+                    }),
+                ],
+                }),
+                Some(AssetInvestmentAllocation {
+                    asset: token_1_admin_client.address.clone(),
+                    strategy_allocations: sorobanvec![
+                        &env,
+                        Some(StrategyAllocation {
+                        strategy_address: strategy_client_token_1.address.clone(),
+                        amount: 200,
+                        }),
+                    ],
+            })
+        ];
+        defindex_vault.invest(
+            &asset_investments,
+        );
 
         // VAULT ADMIN PASSES TRUSTLESS_MANAGER TO VAULT
         defindex_vault.set_manager(&trustless_manager.address);
