@@ -13,10 +13,10 @@ mod vault;
 use storage::{extend_instance_ttl, get_config, set_config};
 
 #[contract]
-pub struct ReflectorChallenge;
+pub struct TrustlessManager;
 
 #[contractimpl]
-impl ReflectorChallenge {
+impl TrustlessManager {
     pub fn __constructor(e: Env, vault: Address, oracle: Address, asset_ratios: Vec<AssetRatio>) {
         if asset_ratios.len() == 0 {
             panic!("Asset ratios must not be empty");
