@@ -175,6 +175,9 @@ fn create_invest_withdraw_instructions(
     let mut withdraw_instructions: Vec<Instruction> = Vec::new(env);
     let mut invest_instructions: Vec<Instruction> = Vec::new(env);
 
+    // if the swapped amount is not enough to be invested, The invest instructions may fail
+    let mut factor_with_slippage_bps: i128;
+
     for (address, deviation) in deviations.iter() {
         // Get the current allocation for the asset
         if let Some(allocation) = current_allocations.get(address.clone()) {
@@ -184,7 +187,13 @@ fn create_invest_withdraw_instructions(
                 ActionType::Invest
             };
 
-            let amount = deviation.abs();
+            if action == ActionType::Withdraw {
+                factor_with_slippage_bps = 10000
+            } else {
+                factor_with_slippage_bps = 9000
+            }
+
+            let amount = deviation.abs()*factor_with_slippage_bps/10000;
 
             // Retrieve the strategy address (we'll use the first one for simplicity)
             let strategy_address = allocation.strategy_allocations.get(0).map(|sa| sa.strategy_address);

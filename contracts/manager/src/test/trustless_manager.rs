@@ -13,6 +13,11 @@ use crate::test::{
     normalize_price, convert_to_seconds};
 use soroban_sdk::{testutils::{Ledger, LedgerInfo}};
 
+use super::soroswap_setup::{create_soroswap_pool, create_soroswap_router, create_soroswap_factory};
+
+extern crate std;
+use std::println;
+
 /*
 // we need to set up original prices for XLM and XRP
 // XLM is 0.5 USD, XRP is 2.5 USD
@@ -171,7 +176,21 @@ fn trustless_manager_works() {
     */
 
     // THE MAGIC MOMENT, REBALANCING USING TRUSTLESS MANAGER
-    let rebalance = test.trustless_manager.rebalance();
+    let soroswap_factory = create_soroswap_factory(&test.env, &test.soroswap_admin);
+    let soroswap_router = create_soroswap_router(&test.env, &test.soroswap_factory.address);
+    
+    test.token_0_admin_client.mint(&test.admin, &9900_0_000_000);
+    test.token_1_admin_client.mint(&test.admin, &1770_5_698_535);
+
+    soroswap_factory.create_pair(&test.token_0.address, &test.token_1.address);
+    let soroswap_pool = create_soroswap_pool(&test.env, &soroswap_router, &test.admin, &test.token_0.address, &test.token_1.address, &9900_0_000_000, &1770_5_698_535);
+    // println!("soroswap_pool. {:?}", soroswap_pool);
+    // println!("admin {:?}", &test.defindex_receiver);
+    // println!("admin {:?}", &test.admin);
+    let soroswap_pair = soroswap_factory.get_pair(&test.token_1.address, &test.token_0.address);
+
+    test.defindex_vault.set_manager(&test.trustless_manager.address);
+    let rebalance = test.trustless_manager.rebalance(&soroswap_router.address, &soroswap_router.address);
 
     // check the new total managed funds
     let mut total_managed_funds_expected = Map::new(&test.env);

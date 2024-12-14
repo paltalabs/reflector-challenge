@@ -1,9 +1,10 @@
 import { Address, Asset, Keypair, nativeToScVal, scValToNative, xdr } from "@stellar/stellar-sdk";
 import { toolkitLoader } from "./toolkit";
-import { invokeContract, airdropAccount } from "soroban-toolkit";
+import { invokeContract, airdropAccount, invokeCustomContract } from "soroban-toolkit";
+import fs from "fs";
 
 const args = process.argv.slice(2);
-if(args.length !== 1){
+if (args.length !== 1) {
   console.error("Usage: yarn start <network>");
   process.exit(1);
 }
@@ -18,7 +19,7 @@ async function main() {
   console.log("-------------------------------------------------------");
   console.log("Vault address:", vaultAddress);
   console.log("-------------------------------------------------------");
-  
+
   //Mintear XRP y XLM para el usuario 100_0_000_000
   const newUser = Keypair.random()
   const mintAmount = nativeToScVal(100_0_000_000, { type: "i128" });
@@ -42,7 +43,7 @@ async function main() {
   ];
 
   await invokeContract(toolkit, "vault", "deposit", depositParams, false, newUser);
-  
+
   const investmentArgs: any[] = [
     {
       asset: xrp_token,
@@ -66,29 +67,29 @@ async function main() {
 
   const mappedParam = xdr.ScVal.scvVec(
     investmentArgs.map((entry) =>
-        xdr.ScVal.scvMap([
-            new xdr.ScMapEntry({
-                key: xdr.ScVal.scvSymbol("asset"),
-                val: entry.asset.toScVal(), // Convert asset address to ScVal
-            }),
-            new xdr.ScMapEntry({
-                key: xdr.ScVal.scvSymbol("strategy_allocations"),
-                val: xdr.ScVal.scvVec(
-                    entry.strategy_investments.map((investment: any) =>
-                        xdr.ScVal.scvMap([
-                            new xdr.ScMapEntry({
-                                key: xdr.ScVal.scvSymbol("amount"),
-                                val: nativeToScVal(BigInt(investment.amount), { type: "i128" }), // Ensure i128 conversion
-                            }),
-                            new xdr.ScMapEntry({
-                                key: xdr.ScVal.scvSymbol("strategy_address"),
-                                val: investment.strategy.toScVal(), // Convert strategy address
-                            }),
-                        ])
-                    )
-                ),
-            }),
-        ])
+      xdr.ScVal.scvMap([
+        new xdr.ScMapEntry({
+          key: xdr.ScVal.scvSymbol("asset"),
+          val: entry.asset.toScVal(), // Convert asset address to ScVal
+        }),
+        new xdr.ScMapEntry({
+          key: xdr.ScVal.scvSymbol("strategy_allocations"),
+          val: xdr.ScVal.scvVec(
+            entry.strategy_investments.map((investment: any) =>
+              xdr.ScVal.scvMap([
+                new xdr.ScMapEntry({
+                  key: xdr.ScVal.scvSymbol("amount"),
+                  val: nativeToScVal(BigInt(investment.amount), { type: "i128" }), // Ensure i128 conversion
+                }),
+                new xdr.ScMapEntry({
+                  key: xdr.ScVal.scvSymbol("strategy_address"),
+                  val: investment.strategy.toScVal(), // Convert strategy address
+                }),
+              ])
+            )
+          ),
+        }),
+      ])
     )
   );
 
@@ -96,7 +97,7 @@ async function main() {
 
   const invested_funds_after_investment = await invokeContract(toolkit, "vault", "fetch_current_invested_funds", [], true);
   const parsed_invested_funds_after_investment = scValToNative(invested_funds_after_investment.result.retval);
-  console.log('parsed result',parsed_invested_funds_after_investment)
+  console.log('parsed result', parsed_invested_funds_after_investment)
 
   const valuesAfterInvest = Object.values(parsed_invested_funds_after_investment);
 
@@ -106,19 +107,35 @@ async function main() {
   const set_manager = await invokeContract(toolkit, "vault", "set_manager", setAdminParams);
   console.log("Set tmanager as admin of vault", set_manager);
 
+  // get_pair address
+  const addressesJson = fs
+    .readFileSync(`./public/${network}.contracts.json`)
+    .toString();
+  const addresses = JSON.parse(addressesJson);
+  const getPairResult = await invokeCustomContract(toolkit, addresses.soroswap_factory, "get_pair",
+    [new Address(addresses.xlm).toScVal(),
+    new Address(toolkit.addressBook.getContractId("XRP")).toScVal()
+    ],
+    true
+  )
+  const pairString = scValToNative(getPairResult.result.retval)
+  console.log("pairAdress", pairString)
   //Rebalance
-  await invokeContract(toolkit, "tmanager", "rebalance", [], false, newUser);
+  await invokeContract(toolkit, "tmanager", "rebalance", [
+    (new Address(addresses.soroswap_router).toScVal()),
+    new Address(pairString).toScVal()
+  ], false, newUser);
 
   const invested_funds_after_rebalance = await invokeContract(toolkit, "vault", "fetch_current_invested_funds", [], true);
   const parsed_invested_funds_after_rebalance = scValToNative(invested_funds_after_rebalance.result.retval);
   const valuesAfterRebalance = Object.values(parsed_invested_funds_after_rebalance);
 
   console.table({
-    XRP:{
+    XRP: {
       "Before rebalance": valuesAfterInvest[0],
       "After rebalance": valuesAfterRebalance[0]
     },
-    XLM:{
+    XLM: {
       "Before rebalance": valuesAfterInvest[1],
       "After rebalance": valuesAfterRebalance[1]
     }

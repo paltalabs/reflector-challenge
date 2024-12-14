@@ -208,6 +208,7 @@ pub struct TrustlessManagerTest<'a> {
     soroswap_factory: SoroswapFactoryClient<'a>,
     soroswap_pair: Address,
     user: Address,
+    soroswap_admin: Address
 }
 
 impl<'a> TrustlessManagerTest<'a> {
@@ -417,6 +418,7 @@ impl<'a> TrustlessManagerTest<'a> {
             soroswap_factory,
             soroswap_pair,
             user,
+            soroswap_admin,
         }
     }
 }
