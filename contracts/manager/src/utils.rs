@@ -153,7 +153,7 @@ fn create_swap_instructions(
 
         // Create instruction
         let instruction = Instruction {
-            action: ActionType::SwapExactIn,
+            action: ActionType::SwapExactIn, 
             strategy: None,
             amount: None,
             swap_details_exact_in: OptionalSwapDetailsExactIn::Some(swap_details),
