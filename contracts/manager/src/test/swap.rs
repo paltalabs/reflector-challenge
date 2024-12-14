@@ -46,6 +46,8 @@ fn test_swap() {
     };
     distribution_vec.push_back(distribution_0);
 
+    test.token_0_admin_client.mint(&test.defindex_vault.address.clone(), &100000000);
+
     // Rebalance from here on
     let instructions = sorobanvec![
         &test.env,
@@ -72,13 +74,13 @@ fn test_swap() {
             }),
             swap_details_exact_out: OptionalSwapDetailsExactOut::None,
         },
-        // Instruction {
-        //     action: ActionType::Invest,
-        //     strategy: Some(test.strategy_client_token_1.address.clone()),
-        //     amount: Some(expected_swap_out?),
-        //     swap_details_exact_in: OptionalSwapDetailsExactIn::None,
-        //     swap_details_exact_out: OptionalSwapDetailsExactOut::None,
-        // }
+        Instruction {
+            action: ActionType::Invest,
+            strategy: Some(test.strategy_client_token_1.address.clone()),
+            amount: Some(17),
+            swap_details_exact_in: OptionalSwapDetailsExactIn::None,
+            swap_details_exact_out: OptionalSwapDetailsExactOut::None,
+        }
     ];
 
     test.defindex_vault.rebalance(&instructions);
