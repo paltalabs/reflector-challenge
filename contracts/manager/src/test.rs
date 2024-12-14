@@ -427,6 +427,6 @@ impl<'a> TrustlessManagerTest<'a> {
 mod utils;
 mod setup;
 mod oracle;
-mod soroswap_setup;
+mod soroswap_setup; 
 mod trustless_manager;
 mod swap;
