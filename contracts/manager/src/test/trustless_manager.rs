@@ -165,14 +165,19 @@ fn trustless_manager_works() {
     );
     
     /*
-        The vault had 2,000*0.5=1,000 USD in XLM and 400*2.5= 1,000 USD in XRP
-        Now the vault has 
-        2000*5=10,000 USD in XLM
-        400*5= 2,000 USD in XRP
-        Total 12,000 USD.
-        This should be splited in 6,000 USD in XLM and 6,000 USD in XRP
-        6,000/5=1,200 XLM
-        6,000/5=1,200 XRP
+        t0: Total TVL 2,000
+        Prices:     XLM = 0.5 USD       XRP = 2.5 USD
+        Reserves:   XLM = 2000          XRP = 400
+        TVL:        1000 USD             1000 USD
+        
+        t1: Total TVL 12,000
+        Prices:     XLM = 5 USD         XRP = 5 USD
+        Reserves:   XLM = 2000          XRP = 400
+        TVL:        10,000 USD            2000 USD
+
+        Ideal TVL:  6,000 USD            6,000 USD
+        Ideal Rsv:  1200 XLM            1200 XRP
+        Acions:     XLM = -800          XRP = +800
     */
 
     // THE MAGIC MOMENT, REBALANCING USING TRUSTLESS MANAGER
@@ -187,26 +192,26 @@ fn trustless_manager_works() {
     let mut total_managed_funds_expected = Map::new(&test.env);
     let strategy_investments_expected_token_0 = sorobanvec![&test.env, StrategyAllocation {
         strategy_address: test.strategy_client_token_0.address.clone(),
-        amount: 6000_0_000_000i128,
+        amount: 1200_0_000_000i128,
     }];
     let strategy_investments_expected_token_1 = sorobanvec![&test.env, StrategyAllocation {
         strategy_address: test.strategy_client_token_1.address.clone(),
-        amount: 6000_0_000_000i128,
+        amount: 1120_0_000_000i128,
     }];
     total_managed_funds_expected.set(test.token_0.address.clone(),
     CurrentAssetInvestmentAllocation {
         asset: test.token_0.address.clone(),
-        total_amount: 6000_0_000_000i128,
+        total_amount: 1200_0_000_000i128,
         idle_amount: 0,
-        invested_amount: 6000_0_000_000i128,
+        invested_amount: 1200_0_000_000i128,
         strategy_allocations: strategy_investments_expected_token_0,
     });
     total_managed_funds_expected.set(test.token_1.address.clone(),
     CurrentAssetInvestmentAllocation {
         asset: test.token_1.address.clone(),
-        total_amount: 6000_0_000_000i128,
-        idle_amount: 0,
-        invested_amount: 6000_0_000_000i128,
+        total_amount: 1138_6_826_702i128,
+        idle_amount: 18_6_826_702i128,
+        invested_amount: 1120_0_000_000i128,
         strategy_allocations: strategy_investments_expected_token_1,
     });
 
