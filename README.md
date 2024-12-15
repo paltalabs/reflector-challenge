@@ -1,10 +1,16 @@
 # Trustless Portfolio Manager using Reflector by PaltaLabs
 
 Smart Contract that helps DeFindex users maintain a 50/50 balanced investment in a safe and trustless way using a decentralized Reflector Network Oracle.  
-**Video:**  
-**Repo:** [https://github.com/paltalabs/reflector-challenge](https://github.com/paltalabs/reflector-challenge)  
-**Contract:**  
-**Invocation:**  
+- **Video:**  https://youtu.be/Mv0JJCSSlx0
+- **Repo:** [https://github.com/paltalabs/reflector-challenge](https://github.com/paltalabs/reflector-challenge)  
+- **Trustees Manager Contract:** [CCXBRLREKJOBXH4TTLIRY6QTZI6LLUPZZWSSOINVJ66C3A755LDLKTIS](https://stellar.expert/explorer/testnet/contract/CCXBRLREKJOBXH4TTLIRY6QTZI6LLUPZZWSSOINVJ66C3A755LDLKTIS)  
+- **Invocation:** [365355688017920](https://stellar.expert/explorer/testnet/tx/365355688017920)  
+- **Admin Account:** [GCXGJSBPVPLBCL5PJTYZCG2QPFYUBXURGJSGNOYAWQ3TB4FMTZ6GUWVX](https://stellar.expert/explorer/testnet/account/GCXGJSBPVPLBCL5PJTYZCG2QPFYUBXURGJSGNOYAWQ3TB4FMTZ6GUWVX)  
+- **User Account:** [GB6DCKSDJJ3H4QO6E4OHGOMFAIEHAQTANXFVQ2R4AVGTQE4RF3U27I73](https://stellar.expert/explorer/testnet/account/GB6DCKSDJJ3H4QO6E4OHGOMFAIEHAQTANXFVQ2R4AVGTQE4RF3U27I73)  
+- **Vault:** [CBZZWNAH4OA53LMJKGPZCP5OZ27LAXVFXS6WWXKXHCLTW2ASZBOVXECR](https://stellar.expert/explorer/testnet/contract/CBZZWNAH4OA53LMJKGPZCP5OZ27LAXVFXS6WWXKXHCLTW2ASZBOVXECR)  
+- **XRP Hodl Strategy:** [CBZLZX5XIJ7YB7XXACSUSBX5OUUHANVCUH5UWDA5EB2M3TAORFYU4O6B](https://stellar.expert/explorer/testnet/contract/CBZLZX5XIJ7YB7XXACSUSBX5OUUHANVCUH5UWDA5EB2M3TAORFYU4O6B)  
+- **XLM Hodl Strategy:** [CDNWVYVXMU36D4X7SP5FC6BZICAGOVIYRWDTVRQNXU3F2HA4ZUQDTCIK](https://stellar.expert/explorer/testnet/contract/CDNWVYVXMU36D4X7SP5FC6BZICAGOVIYRWDTVRQNXU3F2HA4ZUQDTCIK)
+
 
 Made with ♥️ by PaltaLabs 🥑 
 
