@@ -22,6 +22,8 @@ We propose a **trustless portfolio manager** that combines the strengths of **Re
 
 The Trustless Portfolio Manager is implemented as a Smart Contract on Soroban, designed to rebalance a DeFindex Vault based on predefined ratios. This manager's rebalance function can be triggered by a bot or any interested party in a trustless manner; one only needs a wallet with just enough XLM to cover gas fees.
 
+The Defindex Vault: We use a DeFindex vault configured wih two assets: XLM and XRP, each of the asset is configured with a very symple "HODL" Strategy, that just holds the asset on belhalf of the user, however this Strategy can be something more complex like a leveraged position or automated yield farming.
+
 When triggered, the function:
 1. Verifies the current asset prices on Reflector.  
 2. Constructs a series of instructions to execute the rebalancing process.  
@@ -105,4 +107,5 @@ This script will:
 # Future work and improvements:
 - Use Soroswap Aggregator: Currently the Trustless Manager only knows about a specific LP pair in Soroswap. We could let the Trustless Manager to create more complex trades using Soroswap Aggregator in order to get even better prices.
 - Invest all the funds given as return by Soroswap.
-- Proection of Liquidity Pools manipulations: 1) Force that the caller of the rebalance function is an account and no a smart contract (flash loan attack), 2) Check that the LP has the same or similar price as the one given by the oracle.
+- Proection of Liquidity Pools manipulations: 1) Force that the caller of the rebalance function is an account and no a smart contract (flash loan attack), 2) Check that the LP has the same or similar price as the one given by the oracle.\
+- Implement more complex strategies. In this example we just used simple "HODL" strategy, but we could use more complex strategies like leveraged positions, or auocompound yield farming.
