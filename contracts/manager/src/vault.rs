@@ -1,4 +1,4 @@
-use soroban_sdk::{contract, contractimpl, Address, Env, Map, Vec};
+use soroban_sdk::{Address, Env, Map, Vec};
 
 use crate::model::Config;
 

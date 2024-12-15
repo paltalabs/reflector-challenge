@@ -1,6 +1,6 @@
 use soroban_sdk::{panic_with_error, Address, Env, Symbol, Vec};
 
-use crate::{error::ContractError, model::AssetRatio, model::AssetPrice, storage::get_config};
+use crate::{error::ContractError, model::AssetPrice, storage::get_config};
 
 soroban_sdk::contractimport!(
     file = "../reflector.wasm"

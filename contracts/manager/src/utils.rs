@@ -1,4 +1,4 @@
-use crate::model::{Config,AssetPrice, AssetRatio};
+use crate::model::{AssetPrice, AssetRatio};
 use crate::vault::{CurrentAssetInvestmentAllocation, Instruction, ActionType, SwapDetailsExactIn, OptionalSwapDetailsExactIn, OptionalSwapDetailsExactOut, DexDistribution };
 use soroban_sdk::{Address, Env, Map, Vec, String};
 
@@ -24,7 +24,7 @@ pub fn calculate_rebalance(
     let total_weight: i128 = ratios.iter().map(|r| r.ratio).sum();
 
     // get total portfolio
-    let total_portfolio_value = calculate_total_portfolio_value(&e, &current_allocations, &prices);
+    let total_portfolio_value = calculate_total_portfolio_value(&current_allocations, &prices);
 
     // get deviations
     let deviations = calculate_deviations(
@@ -50,7 +50,6 @@ pub fn calculate_rebalance(
 }
 
 fn calculate_total_portfolio_value(
-    env: &Env,
     current_allocations: &Map<Address, CurrentAssetInvestmentAllocation>,
     prices: &Vec<AssetPrice>,
 ) -> i128 {
@@ -107,7 +106,7 @@ fn calculate_deviations(
 fn create_swap_instructions(
     env: &Env,
     deviations: &Map<Address, i128>,
-    prices: &Vec<AssetPrice>,
+    _prices: &Vec<AssetPrice>,
     router: &Address,
     pair: &Address,
 ) -> Vec<Instruction> {

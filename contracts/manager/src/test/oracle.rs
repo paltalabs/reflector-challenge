@@ -9,7 +9,7 @@ use soroban_sdk::{
     // Vec, 
     // BytesN
 };
-use crate::test::{TrustlessManagerTest, Asset, ConfigData, PriceData, normalize_price, convert_to_seconds};
+use crate::test::{TrustlessManagerTest, Asset, PriceData, normalize_price, convert_to_seconds};
 use soroban_sdk::{testutils::{Ledger, LedgerInfo}};
 
 

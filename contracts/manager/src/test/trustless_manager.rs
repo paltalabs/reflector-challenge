@@ -6,17 +6,14 @@ use soroban_sdk::{
 use crate::test::{
     TrustlessManagerTest, 
     Asset, 
-    ConfigData, 
     PriceData,
     CurrentAssetInvestmentAllocation,
     StrategyAllocation,
     normalize_price, convert_to_seconds};
 use soroban_sdk::{testutils::{Ledger, LedgerInfo}};
 
-use super::soroswap_setup::{create_soroswap_pool, create_soroswap_router, create_soroswap_factory};
-
 extern crate std;
-use std::println;
+// use std::println;
 
 /*
 // we need to set up original prices for XLM and XRP
@@ -186,7 +183,7 @@ fn trustless_manager_works() {
     test.token_1_admin_client.mint(&test.admin, &1770_5_698_535);
 
 
-    let rebalance = test.trustless_manager.rebalance();
+    test.trustless_manager.rebalance();
 
     // check the new total managed funds
     let mut total_managed_funds_expected = Map::new(&test.env);

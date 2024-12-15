@@ -1,5 +1,5 @@
 use soroban_sdk::{
-    testutils::Address as _, vec, Address, BytesN, Env, String
+    vec, Address, BytesN, Env, String
 };
 
 fn pair_contract_wasm(e: &Env) -> BytesN<32> {

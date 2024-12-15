@@ -1,5 +1,5 @@
-use crate::model::{Config, AssetPrice, AssetRatio};
-use crate::vault::{CurrentAssetInvestmentAllocation, Instruction, StrategyAllocation, ActionType, OptionalSwapDetailsExactIn};
+use crate::model::{AssetPrice, AssetRatio};
+use crate::vault::{CurrentAssetInvestmentAllocation, StrategyAllocation};
 use soroban_sdk::{testutils::Address as _, Address, Env, Map, Vec, Symbol};
 
 extern crate std;
@@ -32,11 +32,11 @@ fn test_calculate_rebalance_multiple_assets() {
 
     // Create two assets and their strategies
     // Create sample token addresses
-    let token_XRP = Address::from_str(
+    let token_xrp = Address::from_str(
         &env,
         "CACY3RX5UGOG43AZ5O4SVWRPPVXLTHBU3CKPFLCRPB5BY46LES6JLYOR",
     );
-    let token_XLM = Address::from_str(
+    let token_xlm = Address::from_str(
         &env,
         "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
     );
@@ -49,8 +49,8 @@ fn test_calculate_rebalance_multiple_assets() {
         "CAHWETYSTW2WEW3RRSOZI6QVBY5MJX75EA3ZBGLSP5HXU2JDE23S2LTL",
     );
 
-    println!("token_XRP: {:?}", token_XRP);
-    println!("token_XLM: {:?}", token_XLM);
+    println!("token_xrp: {:?}", token_xrp);
+    println!("token_xlm: {:?}", token_xlm);
     println!("hodl_xrp: {:?}", hodl_xrp);
     println!("hodl_xlm: {:?}", hodl_xlm);
     // Create strategy allocations for both assets
@@ -72,7 +72,7 @@ fn test_calculate_rebalance_multiple_assets() {
 
     // Create current allocations for both assets
     let allocation1 = CurrentAssetInvestmentAllocation {
-        asset: token_XRP.clone(),
+        asset: token_xrp.clone(),
         total_amount: 100_0_000_000,
         idle_amount: 100_0_000_000,
         invested_amount: 0,
@@ -80,26 +80,26 @@ fn test_calculate_rebalance_multiple_assets() {
     };
 
     let allocation2 = CurrentAssetInvestmentAllocation {
-        asset: token_XLM.clone(),
+        asset: token_xlm.clone(),
         total_amount: 100_0_000_000,
         idle_amount: 100_0_000_000,
         invested_amount: 0,
         strategy_allocations: strategy_allocations2,
     };
 
-    current_allocations.set(token_XRP.clone(), allocation1);
-    current_allocations.set(token_XLM.clone(), allocation2);
+    current_allocations.set(token_xrp.clone(), allocation1);
+    current_allocations.set(token_xlm.clone(), allocation2);
 
     let prices: Vec<AssetPrice> = Vec::from_array(
         &env,
         [
             AssetPrice {
-                asset: token_XRP.clone(),
+                asset: token_xrp.clone(),
                 symbol: Symbol::new(&env, "XRP"),
                 price: 24300000
             },
             AssetPrice {
-                asset: token_XLM.clone(),
+                asset: token_xlm.clone(),
                 symbol: Symbol::new(&env, "XLM"),
                 price: 4344000
             }
@@ -109,14 +109,14 @@ fn test_calculate_rebalance_multiple_assets() {
         &env,
         [
             AssetRatio{
-                asset: token_XRP.clone(),
+                asset: token_xrp.clone(),
                 symbol: Symbol::new(
                     &env, "XRP"
                 ),
                 ratio:1000
             },
             AssetRatio{
-                asset: token_XLM.clone(),
+                asset: token_xlm.clone(),
                 symbol: Symbol::new(
                     &env, "XLM"
                 ),

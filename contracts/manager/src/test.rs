@@ -15,7 +15,7 @@ use soroban_sdk::{
     Symbol,
 };
 use soroswap_setup::{create_soroswap_aggregator, create_soroswap_factory, create_soroswap_pool, create_soroswap_router, SoroswapFactoryClient, SoroswapRouterClient};
-use std::vec;
+// use std::vec;
 
 use crate::{TrustlessManager, TrustlessManagerClient, AssetRatio};
 
@@ -174,13 +174,13 @@ pub(crate) fn get_token_admin_client<'a>(
 //     ]
 // }
 
-pub(crate) fn generate_random_users(e: &Env, users_count: u32) -> vec::Vec<Address> {
-        let mut users = vec![];
-        for _c in 0..users_count {
-            users.push(Address::generate(e));
-        }
-        users
-}
+// pub(crate) fn generate_random_users(e: &Env, users_count: u32) -> vec::Vec<Address> {
+//         let mut users = vec![];
+//         for _c in 0..users_count {
+//             users.push(Address::generate(e));
+//         }
+//         users
+// }
 
 const DECIMALS: u32 = 14;
 pub fn normalize_price(price: i128) -> i128 {
@@ -198,10 +198,10 @@ pub struct TrustlessManagerTest<'a> {
     defindex_receiver: Address,
     token_0_admin_client: SorobanTokenAdminClient<'a>,
     token_0: SorobanTokenClient<'a>,
-    token_0_admin: Address,
+    // token_0_admin: Address,
     token_1_admin_client: SorobanTokenAdminClient<'a>,
     token_1: SorobanTokenClient<'a>,
-    token_1_admin: Address,
+    // token_1_admin: Address,
     strategy_client_token_0: HodlStrategyClient<'a>,
     strategy_client_token_1: HodlStrategyClient<'a>,
     reflector: ReflectorClient<'a>,
@@ -210,7 +210,7 @@ pub struct TrustlessManagerTest<'a> {
     soroswap_factory: SoroswapFactoryClient<'a>,
     soroswap_pair: Address,
     user: Address,
-    soroswap_admin: Address
+    // soroswap_admin: Address
 }
 
 impl<'a> TrustlessManagerTest<'a> {
@@ -410,10 +410,10 @@ impl<'a> TrustlessManagerTest<'a> {
             defindex_vault,
             token_0_admin_client,
             token_0,
-            token_0_admin,
+            // token_0_admin,
             token_1_admin_client,
             token_1,
-            token_1_admin,
+            // token_1_admin,
             strategy_client_token_0,
             strategy_client_token_1,
             reflector,
@@ -422,7 +422,7 @@ impl<'a> TrustlessManagerTest<'a> {
             soroswap_factory,
             soroswap_pair,
             user,
-            soroswap_admin,
+            // soroswap_admin,
         }
     }
 }

@@ -11,7 +11,7 @@ use soroban_sdk::{
     // Vec, 
     // BytesN
 };
-use crate::test::{TrustlessManagerTest, Asset, ConfigData, StrategyAllocation, CurrentAssetInvestmentAllocation};
+use crate::test::{TrustlessManagerTest, Asset, StrategyAllocation, CurrentAssetInvestmentAllocation};
 
 #[test]
 fn test_setup() {

@@ -9,9 +9,9 @@ use soroban_sdk::{
     // Vec, 
     // BytesN
 };
-use crate::test::{TrustlessManagerTest, Asset, ConfigData};
+use crate::test::{TrustlessManagerTest};
 
-use super::defindex_vault::{ActionType, AssetInvestmentAllocation, DexDistribution, Instruction, OptionalSwapDetailsExactIn, OptionalSwapDetailsExactOut, StrategyAllocation, SwapDetailsExactIn};
+use super::defindex_vault::{ActionType, DexDistribution, Instruction, OptionalSwapDetailsExactIn, OptionalSwapDetailsExactOut, SwapDetailsExactIn};
 
 #[test]
 fn test_swap() {
