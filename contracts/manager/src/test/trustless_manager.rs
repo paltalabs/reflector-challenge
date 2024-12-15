@@ -186,7 +186,7 @@ fn trustless_manager_works() {
     test.token_1_admin_client.mint(&test.admin, &1770_5_698_535);
 
 
-    let rebalance = test.trustless_manager.rebalance(&test.soroswap_router.address, &test.soroswap_pair);
+    let rebalance = test.trustless_manager.rebalance();
 
     // check the new total managed funds
     let mut total_managed_funds_expected = Map::new(&test.env);

@@ -21,7 +21,14 @@ pub struct TrustlessManager;
 
 #[contractimpl]
 impl TrustlessManager {
-    pub fn __constructor(e: Env, vault: Address, oracle: Address, asset_ratios: Vec<AssetRatio>) {
+    pub fn __constructor(
+        e: Env, 
+        vault: Address, 
+        oracle: Address, 
+        asset_ratios: Vec<AssetRatio>,
+        router: Address, 
+        pair: Address, 
+    ) {
         if asset_ratios.is_empty() {
             panic_with_error!(&e, ContractError::AssetRatiosMustNotBeEmpty);
         }
@@ -30,6 +37,8 @@ impl TrustlessManager {
             vault,
             oracle,
             asset_ratios,
+            router,
+            pair
         };
 
         set_config(&e, config);
@@ -39,7 +48,7 @@ impl TrustlessManager {
         get_config(&e)
     }
 
-    pub fn rebalance(e: Env, router: Address, pair: Address) -> String {
+    pub fn rebalance(e: Env) -> String {
         extend_instance_ttl(&e);
         let config = get_config(&e);
 
@@ -55,8 +64,8 @@ impl TrustlessManager {
             current_allocations,
             asset_prices,
             config.asset_ratios.clone(),
-            router,
-            pair);
+            config.router.clone(),
+            config.pair.clone());
 
         // Execute instructions
         

@@ -126,10 +126,12 @@ fn create_trustless_manager<'a>(
     e: &Env,
     vault: &Address,
     oracle: &Address,
-    asset_ratios: &Vec<AssetRatio>
+    asset_ratios: &Vec<AssetRatio>,
+    router: &Address,
+    pair: &Address 
 ) -> TrustlessManagerClient<'a> {
     // __constructor(e: Env, vault: Address, oracle: Address, asset_ratios: Vec<AssetRatio>
-    let args = (vault.clone(), oracle.clone(), asset_ratios.clone());
+    let args = (vault.clone(), oracle.clone(), asset_ratios.clone(), router.clone(), pair.clone());
     let address = &e.register(TrustlessManager, args);
     TrustlessManagerClient::new(e, address)
     
@@ -235,7 +237,7 @@ impl<'a> TrustlessManagerTest<'a> {
 
         let soroswap_factory = create_soroswap_factory(&env, &soroswap_admin);
         let soroswap_router = create_soroswap_router(&env, &soroswap_factory.address);
-        create_soroswap_pool(&env, &soroswap_router, &soroswap_admin, &token_0.address, &token_1.address, &10000_0_000_000, &10000_0_000_000);
+        create_soroswap_pool(&env, &soroswap_router, &soroswap_admin, &token_0.address, &token_1.address, &10000_0_000_000, &10000_0_000_000    );
         let soroswap_pair = soroswap_factory.get_pair(&token_0.address, &token_1.address);
 
         let soroswap_aggregator = create_soroswap_aggregator(&env, &soroswap_admin, &soroswap_router.address);
@@ -338,7 +340,9 @@ impl<'a> TrustlessManagerTest<'a> {
                     symbol: Symbol::new(&env, "XRP"),
                     ratio: 1000,
                 },
-            ]
+            ],
+            &soroswap_router.address,
+            &soroswap_pair
         );
 
          // ADMIN DEPOSITS 1000 XLM, => 500 USD & 200 XRP, => 500 USD into the vault

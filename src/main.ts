@@ -128,10 +128,7 @@ async function main() {
   const pairString = scValToNative(getPairResult.result.retval)
   console.log("pairAdress", pairString)
   //Rebalance
-  await invokeContract(toolkit, "tmanager", "rebalance", [
-    (new Address(addresses.soroswap_router).toScVal()),
-    new Address(pairString).toScVal()
-  ], false, newUser);
+  await invokeContract(toolkit, "tmanager", "rebalance", [], false, newUser);
 
   const idle_funds_after_rebalance = await invokeContract(toolkit, "vault", "fetch_current_idle_funds", [], true);
   const parsed_idle_funds_after_rebalance = scValToNative(idle_funds_after_rebalance.result.retval);

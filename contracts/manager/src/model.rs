@@ -22,4 +22,6 @@ pub struct Config {
     pub vault: Address,
     pub oracle: Address,
     pub asset_ratios: Vec<AssetRatio>,
+    pub router: Address,
+    pub pair: Address,
 }

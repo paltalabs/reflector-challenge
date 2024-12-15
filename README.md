@@ -1,60 +1,108 @@
-# Trustless rebalancer:
+# Trustless Portfolio Manager using Reflector by PaltaLabs
+
+Smart Contract that helps DeFindex users maintain a 50/50 balanced investment in a safe and trustless way using a decentralized Reflector Network Oracle.  
+**Video:**  
+**Repo:** [https://github.com/paltalabs/reflector-challenge](https://github.com/paltalabs/reflector-challenge)  
+**Contract:**  
+**Invocation:**  
+
+Made with ♥️ by PaltaLabs 🥑 
+
+## Problem
+
+Many users seek to maintain a balanced portfolio. For instance, a user might aim to hold 50% of their portfolio's value in XLM and 50% in XRP. Achieving this balance requires frequent rebalancing. For example, if the price of XLM rises significantly, the user would need to sell some XLM and buy XRP to restore the 50:50 ratio in terms of USD. This manual process is not only time-consuming but also complex, especially if the user wants to invest these assets in a lending protocol or similar platforms. Additionally, frequent transactions increase risks, as users must keep their wallets connected to the internet, which exposes them to potential security threats.
+
+## Solution
+
+We propose a **trustless portfolio manager** that combines the strengths of **Reflector**, **DeFindex**, and **Soroswap** to automate portfolio rebalancing.
+
+- Reflector ensures accurate pricing data and protects against vulnerabilities in on-chain price feeds, such as flash loan attack risks.
+- DeFindex enables multiple users to maintain a managed portfolio within the same configured Vault.
+- Soroswap facilitates asset exchanges using an Automated Market Maker model.
+
+The Trustless Portfolio Manager is implemented as a Smart Contract on Soroban, designed to rebalance a DeFindex Vault based on predefined ratios. This manager's rebalance function can be triggered by a bot or any interested party in a trustless manner; one only needs a wallet with just enough XLM to cover gas fees.
+
+When triggered, the function:
+1. Verifies the current asset prices on Reflector.  
+2. Constructs a series of instructions to execute the rebalancing process.  
+3. Executes trades to maintain the desired asset allocation, ensuring a balanced portfolio.
+
+By automating these processes, the trustless manager rebalances the vault of several users, eliminates the need for users to manually rebalance their portfolios, reduces risks associated with constant wallet connectivity, and simplifies complex interactions with decentralized finance (DeFi) protocols.
+
+## References
+
+- [Reflector.Network Documentation](https://reflector.network/docs)  
+- [DeFindex Whitepaper](https://docs.defindex.io/whitepaper/10-whitepaper/01-introduction)  
+- [Soroswap Documentation](https://docs.soroswap.finance/)  
+
+
+
+# Development
 
 ## Setting up your local instance:
-If you want to try trustless rebalancer for yourself you need to:
+If you want to try the trustless rebalancer for yourself, you need to:
 
-### Clone the repo:
-In a new terminal run: `git clone https://github.com/paltalabs/reflector-challenge`
-and navigate to the new folder. 
+1. **Clone the repo:**
+```bash
+git clone https://github.com/paltalabs/reflector-challenge`
+cd reflector-challenge
+```
+2. **Run the Docker Container:**
 
-    cd reflector-challenge
-### Run the container:
-(If it´s your first time using a soroban docker image this step will take a while.)
+To try everything with exactly the same versions as the dev team, and to avoid installing specific software like Soroban CLI, use our Docker image. (If it’s your first time using a Soroban Docker image, this step will take a while.)
 
     docker compose up -d && bash run.sh
 
-### Set up the env:
-Copy the .env.example and create a new .env file in the root folder of the project:
+3. Set up the env:
 
-    cp .env.example .env
+```bash
+cp .env.example .env
+```
 
-And fill the admin secret key using a soroban secret key format string, and the aggregator addresses using a soroban public address fromat string.
+Fill it with the admin secret key. This will be the account that will deploy all the contracts and perform all the invocations. The scripts will handle the Friendbot!
 
-### Install dependencies:
-Install the project dependencies using yarn:
-
+4. **Install dependencies**:
+```bash
     yarn install
+```
+5. **Build and deploy the contracts**:
 
-### Build and deploy the contracts:
-In order to deploy your smart contracts you should navigate to the contracts folder and build the files running:
+To deploy your smart contracts, navigate to the contracts folder and build the files by running:
 
      cd contracts && make build
 
-Once this process has finished you can deploy each contract running in this exact order: 
+Once this process has finished, you can deploy each contract in the following exact order:
 
  ``` bash
-yarn deployXRPToken # Create XRP Soroban Token and save address in .soroban folder
+yarn deployXRPToken # Create XRP Soroban Token and save the address in the .soroban folder
 yarn mintAndCreateLP # Mint XRP Tokens and create LP with native Testnet XLM in Soroswap
-yarn deployHodl # Deploy Hodl strategies for XRP & XLM contracts and save address in .soroban folder
+yarn deployHodl # Deploy HODL strategies for XRP & XLM contracts and save the address in the .soroban folder
 yarn deployFactory # Deploy the defindex factory
-yarn deployVault # Deploys a vault with 2 assets and one strategy each
-yarn deployTManager
+yarn deployVault # Deploy a vault with 2 assets and one strategy each
+yarn deployTManager # Deploy the Trustless Portfolio Manager
  ```
 
 Or deploy them all at once by running:
 
     yarn deployTestnet
 
-## Testing the trustless rebalancer:
+## Testing the Trustless Portafolio Rebalancer:
 Once you have deployed all the contracts you can run
 ``` bash
     #usage: yarn start <network>
     yarn start testnet
 ```
 This script will:
-	- Mint XLM and XRP to a test account.
-	- Deposit XLM and XRP into a defindex vault.
-	- Invest XLM and XRP in their own HODL strategies.
-	- Set the Trustless Manager contract as the vault manager.
-	- Call the rebalance method in the vault.
-	- Display a table with the results.
+    
+- Mint XLM and XRP to a test account.
+- Deposit XLM and XRP into a defindex vault.
+- Invest XLM and XRP in their own HODL strategies.
+- Set the Trustless Manager contract as the vault manager.
+- Call the rebalance method in the vault.
+- Display a table with the results.
+
+
+# Future work and improvements:
+- Use Soroswap Aggregator: Currently the Trustless Manager only knows about a specific LP pair in Soroswap. We could let the Trustless Manager to create more complex trades using Soroswap Aggregator in order to get even better prices.
+- Invest all the funds given as return by Soroswap.
+- Proection of Liquidity Pools manipulations: 1) Force that the caller of the rebalance function is an account and no a smart contract (flash loan attack), 2) Check that the LP has the same or similar price as the one given by the oracle.
