@@ -32,7 +32,8 @@ async function main() {
 
   //Deposit XRP y XLM al vault
 
-  const depositAmount = nativeToScVal(100_000_000, { type: "i128" });
+  const amount = 10_0_000_000;
+  const depositAmount = nativeToScVal(amount, { type: "i128" });
   let amountsDesired = [depositAmount, depositAmount];
   let amountsMin = [depositAmount, depositAmount];
   const depositParams: xdr.ScVal[] = [
@@ -50,7 +51,7 @@ async function main() {
       strategy_investments: [
         {
           strategy: new Address(toolkit.addressBook.getContractId("hodl_xrp")),
-          amount: 100_000_000,
+          amount: amount,
         },
       ],
     },
@@ -59,7 +60,7 @@ async function main() {
       strategy_investments: [
         {
           strategy: new Address(toolkit.addressBook.getContractId("hodl_xlm")),
-          amount: 100_000_000,
+          amount: amount,
         },
       ],
     },
@@ -95,11 +96,17 @@ async function main() {
 
   await invokeContract(toolkit, "vault", "invest", [mappedParam], false, toolkit.admin);
 
+  const idle_funds_after_investment = await invokeContract(toolkit, "vault", "fetch_current_idle_funds", [], true);
+  const parsed_idle_funds_after_investment = scValToNative(idle_funds_after_investment.result.retval);
+  console.log('idle funds: parsed result', parsed_idle_funds_after_investment)
+
+
   const invested_funds_after_investment = await invokeContract(toolkit, "vault", "fetch_current_invested_funds", [], true);
   const parsed_invested_funds_after_investment = scValToNative(invested_funds_after_investment.result.retval);
   console.log('parsed result', parsed_invested_funds_after_investment)
 
-  const valuesAfterInvest = Object.values(parsed_invested_funds_after_investment);
+  const idleValuesAfterInvest = Object.values(parsed_idle_funds_after_investment);
+  const investedValuesAfterInvest = Object.values(parsed_invested_funds_after_investment);
 
   //Set tmanager as vault manager
   const tmanagerAddress = toolkit.addressBook.getContractId("tmanager");
@@ -126,18 +133,27 @@ async function main() {
     new Address(pairString).toScVal()
   ], false, newUser);
 
+  const idle_funds_after_rebalance = await invokeContract(toolkit, "vault", "fetch_current_idle_funds", [], true);
+  const parsed_idle_funds_after_rebalance = scValToNative(idle_funds_after_rebalance.result.retval);
+
   const invested_funds_after_rebalance = await invokeContract(toolkit, "vault", "fetch_current_invested_funds", [], true);
   const parsed_invested_funds_after_rebalance = scValToNative(invested_funds_after_rebalance.result.retval);
-  const valuesAfterRebalance = Object.values(parsed_invested_funds_after_rebalance);
+
+  const idleValuesAfterRebalance = Object.values(parsed_idle_funds_after_rebalance);
+  const investedValuesAfterRebalance = Object.values(parsed_invested_funds_after_rebalance);
 
   console.table({
     XRP: {
-      "Before rebalance": valuesAfterInvest[0],
-      "After rebalance": valuesAfterRebalance[0]
+      "Idle Before rebalance": idleValuesAfterInvest[0],
+      "Idle After rebalance": idleValuesAfterRebalance[0],
+      "Invested Before rebalance": investedValuesAfterInvest[0],
+      "Invested After rebalance": investedValuesAfterRebalance[0]
     },
     XLM: {
-      "Before rebalance": valuesAfterInvest[1],
-      "After rebalance": valuesAfterRebalance[1]
+      "Idle Before rebalance": idleValuesAfterInvest[1],
+      "Idle After rebalance": idleValuesAfterRebalance[1],
+      "Invested Before rebalance": investedValuesAfterInvest[1],
+      "Invested After rebalance": investedValuesAfterRebalance[1]
     }
 
   })

@@ -22,12 +22,12 @@ async function main() {
   await invokeContract(toolkit, "XRP", "mint", mintParams);
 
   // at the time of writing
-  // 1 XRP = $2.3 ==> 1 USD = 0.43 XRP
-  // 1 XLM = $0.46 ==> 1 USD = 2.17 XLM
+  // 1 XRP = $2.39 ==> 1 USD = 0.418410042 XRP
+  // 1 XLM = $0.41 ==> 1 USD = 2.43902439 XLM
 
-  // We will create a 200 USD Valued LP, with 100 USD of XRP and 100 USD of XLM
-  // 100 USD of XRP = 100 * 0.43 = 43 XRP
-  // 100 USD of XLM = 100 * 2.17 = 217 XLM
+  // We will create a 2000 USD Valued LP, with 1000 USD of XRP and 1000 USD of XLM
+  // 1000 USD of XLM = 1000 * 2.43902439 = 2439.0243900 XLM
+  // 1000 USD of XRP = 1000 * 0.418410042 = 418.4100420 XRP
 
   // Get Soroswap Router Address from public/testnet.soroswap.json using fs.readFileSync
 
@@ -60,8 +60,8 @@ async function main() {
   const addLiquidityScValParams: xdr.ScVal[] = [
     new Address(addresses.xlm).toScVal(),
     new Address(toolkit.addressBook.getContractId("XRP")).toScVal(),
-    nativeToScVal(2170000000, { type: "i128" }),
-    nativeToScVal(430000000, { type: "i128" }),
+    nativeToScVal(2439_0_243_900, { type: "i128" }),
+    nativeToScVal(418_4_100_420, { type: "i128" }),
     nativeToScVal(0, { type: "i128" }),
     nativeToScVal(0, { type: "i128" }),
     new Address(toolkit.admin.publicKey()).toScVal(),

@@ -38,6 +38,7 @@ yarn mintAndCreateLP # Mint XRP Tokens and create LP with native Testnet XLM in 
 yarn deployHodl # Deploy Hodl strategies for XRP & XLM contracts and save address in .soroban folder
 yarn deployFactory # Deploy the defindex factory
 yarn deployVault # Deploys a vault with 2 assets and one strategy each
+yarn deployTManager
  ```
 
 Or deploy them all at once by running:
